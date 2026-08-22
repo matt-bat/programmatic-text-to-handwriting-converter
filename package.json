@@ -1,0 +1,41 @@
+{
+  "name": "scribble-lab",
+  "version": "1.0.0",
+  "description": "Local-first synthetic handwriting generator with cursive and print styles, natural character variation, tunable profiles, Markdown import, and PDF export.",
+  "private": true,
+  "type": "module",
+  "author": "Matthew Bateman",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/matt-bat/scribble-lab#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matt-bat/scribble-lab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/matt-bat/scribble-lab/issues"
+  },
+  "funding": "https://ko-fi.com/matt0bat",
+  "keywords": [
+    "synthetic-handwriting",
+    "handwriting-generator",
+    "procedural-generation",
+    "local-first",
+    "markdown",
+    "pdf-export",
+    "ocr",
+    "accessibility"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "test": "node --test tests/*.test.js",
+    "test:browser": "playwright test",
+    "check": "node --check src/app.js && node --check src/handwriting-engine.js && node --check src/profile-store.js && node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.62.1"
+  }
+}

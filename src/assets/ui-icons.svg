@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+  <defs>
+    <symbol id="sl-icon-refresh" viewBox="0 0 24 24">
+      <path d="M 19 8 A 8 8 0 1 0 20 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M 19 3 V 8 H 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sl-icon-metadata" viewBox="0 0 24 24">
+      <path d="M 6 3 H 14 L 18 7 V 21 H 6 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M 14 3 V 7 H 18 M 9 11 H 15 M 9 15 H 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sl-icon-pdf" viewBox="0 0 24 24">
+      <path d="M 6 3 H 14 L 18 7 V 21 H 6 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M 14 3 V 7 H 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M 9 16 V 11 H 11 A 1.7 1.7 0 0 1 11 14 H 9 M 14 16 V 11 H 15 A 2 2 0 0 1 15 16 Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sl-icon-export" viewBox="0 0 24 24">
+      <path d="M 12 3 V 15 M 8 7 L 12 3 L 16 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 5 13 V 20 H 19 V 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sl-icon-compose" viewBox="0 0 24 24">
+      <path d="M 5 18 C 9 14 11 18 14 15 S 18 14 20 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M 6 13 L 15 4 L 19 8 L 10 17 L 5 18 Z M 14 5 L 18 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sl-icon-motion" viewBox="0 0 24 24">
+      <path d="M 3 12 C 6 5 9 19 12 12 S 18 5 21 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sl-icon-materials" viewBox="0 0 24 24">
+      <path d="M 12 3 C 9 8 6 11 6 15 A 6 6 0 0 0 18 15 C 18 11 15 8 12 3 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M 9 16 A 3 3 0 0 0 12 19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sl-icon-profiles" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M 5 20 C 5.7 15.6 8 14 12 14 S 18.3 15.6 19 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="sl-icon-private" viewBox="0 0 24 24">
+      <path d="M 12 3 L 19 6 V 11 C 19 15.4 16.4 18.8 12 21 C 7.6 18.8 5 15.4 5 11 V 6 Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M 9 12 L 11 14 L 15 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>

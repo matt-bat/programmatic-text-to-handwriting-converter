@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Generate natural identity-free synthetic handwriting in cursive and print styles, entirely in your browser." />
+    <meta name="author" content="Matthew Bateman" />
+    <meta name="application-name" content="Scribble Lab" />
+    <meta name="theme-color" content="#efe6d3" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Scribble Lab | Synthetic Handwriting" />
+    <meta property="og:description" content="A local-first procedural handwriting generator with natural character variation, tunable profiles, Markdown import, and PDF export." />
+    <meta property="og:image" content="https://raw.githubusercontent.com/matt-bat/scribble-lab/main/docs/screenshots/scribble-lab-desktop.png" />
+    <meta property="og:url" content="https://github.com/matt-bat/scribble-lab" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Scribble Lab | Synthetic Handwriting</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="ambient-grid" aria-hidden="true"></div>
+    <main class="app-shell">
+      <header class="titlebar">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true"><img src="./src/assets/scribble-lab-mark.svg" alt="" /></div>
+          <div>
+            <p class="eyebrow">A private writing studio</p>
+            <h1>Scribble<span>Lab</span></h1>
+          </div>
+        </div>
+        <div class="header-status" aria-label="Application status">
+          <span class="status-lamp" aria-hidden="true"></span>
+          <span>Local engine</span>
+          <span class="header-divider"></span>
+          <span id="engineStatus">Ready</span>
+        </div>
+        <div class="header-actions">
+          <button class="button button-ghost" type="button" id="newSeedButton" title="Generate a new randomized sample">
+            <svg class="button-icon" aria-hidden="true" focusable="false"><use href="./src/assets/ui-icons.svg#sl-icon-refresh"></use></svg>
+            <span>New sample</span>
+          </button>
+          <button class="button button-ghost" type="button" id="metadataButton">
+            <svg class="button-icon" aria-hidden="true" focusable="false"><use href="./src/assets/ui-icons.svg#sl-icon-metadata"></use></svg>
+            <span>Metadata</span>
+          </button>
+          <button class="button button-primary" type="button" id="pdfButton" title="Create a paginated document and open the print dialog">
+            <svg class="button-icon" aria-hidden="true" focusable="false"><use href="./src/assets/ui-icons.svg#sl-icon-pdf"></use></svg>
+            <span>Export PDF</span>
+          </button>
+        </div>
+      </header>
+
+      <nav class="tab-rail" aria-label="Generator settings">
+        <div class="tab-list" role="tablist" aria-label="Control groups">
+          <button class="tab is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-compose" id="tab-compose" data-tab="compose">
+            <svg class="tab-icon" aria-hidden="true" focusable="false"><use href="./src/assets/ui-icons.svg#sl-icon-compose"></use></svg> Compose
+          </button>
+          <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel-motion" id="tab-motion" data-tab="motion">
+            <svg class="tab-icon" aria-hidden="true" focusable="false"><use href="./src/assets/ui-icons.svg#sl-icon-motion"></use></svg> Hand motion
+          </button>
+          <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel-materials" id="tab-materials" data-tab="materials">
+            <svg class="tab-icon" aria-hidden="true" focusable="false"><use href="./src/assets/ui-icons.svg#sl-icon-materials"></use></svg> Materials
+          </button>
+          <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel-profiles" id="tab-profiles" data-tab="profiles">
+            <svg class="tab-icon" aria-hidden="true" focusable="false"><use href="./src/assets/ui-icons.svg#sl-icon-profiles"></use></svg> Profiles
+          </button>
+        </div>
+        <div class="safety-note" title="This application cannot import or match handwriting samples">
+          <svg class="safety-icon" aria-hidden="true" focusable="false"><use href="./src/assets/ui-icons.svg#sl-icon-private"></use></svg> Identity-free generator
+        </div>
+      </nav>
+
+      <section class="control-deck" aria-label="Handwriting controls">
+        <div class="tab-panel is-active" id="panel-compose" role="tabpanel" aria-labelledby="tab-compose" data-panel="compose">
+          <label class="control readability-control">
+            <span class="control-label">
+              <span>Expected readability <small>Coordinates motion, spacing, and stroke controls</small></span>
+              <output data-output="readability">Balanced · 65%</output>
+            </span>
+            <input type="range" id="readability" min="0" max="100" value="65" aria-describedby="readabilityScale" />
+            <span class="readability-scale" id="readabilityScale"><span>Loose</span><span>Clear</span></span>
+          </label>
+          <fieldset class="control-cluster instrument-cluster">
+            <legend>Instrument</legend>
+            <div class="segmented-control" id="instrumentControl">
+              <button type="button" class="segment is-active" data-value="pen" aria-pressed="true"><span class="instrument-dot pen-dot"></span>Pen</button>
+              <button type="button" class="segment" data-value="pencil" aria-pressed="false"><span class="instrument-dot pencil-dot"></span>Pencil</button>
+              <button type="button" class="segment" data-value="marker" aria-pressed="false"><span class="instrument-dot marker-dot"></span>Marker</button>
+            </div>
+          </fieldset>
+          <fieldset class="control-cluster style-cluster">
+            <legend>Writing style</legend>
+            <div class="segmented-control" id="styleControl">
+              <button type="button" class="segment is-active" data-value="cursive" aria-pressed="true">Cursive</button>
+              <button type="button" class="segment" data-value="print" aria-pressed="false">Print</button>
+            </div>
+          </fieldset>
+          <label class="control control-seed">
+            <span class="control-label">Sample seed <output data-output="seed">43182</output></span>
+            <input type="number" id="seed" min="1" max="999999" value="43182" inputmode="numeric" />
+          </label>
+          <label class="control">
+            <span class="control-label">Letter size <output data-output="size">34 px</output></span>
+            <input type="range" id="size" min="22" max="52" value="34" />
+          </label>
+          <label class="control">
+            <span class="control-label">Character spacing <output data-output="spacing">3 px</output></span>
+            <input type="range" id="spacing" min="-2" max="14" value="3" />
+          </label>
+          <label class="control">
+            <span class="control-label">Line spacing <output data-output="lineHeight">1.62×</output></span>
+            <input type="range" id="lineHeight" min="1.25" max="2.10" step="0.01" value="1.62" />
+          </label>
+        </div>
+
+        <div class="tab-panel" id="panel-motion" role="tabpanel" aria-labelledby="tab-motion" data-panel="motion" hidden>
+          <label class="control">
+            <span class="control-label">Writing speed <output data-output="speed">54%</output></span>
+            <input type="range" id="speed" min="0" max="100" value="54" />
+          </label>
+          <label class="control">
+            <span class="control-label">Shakiness <output data-output="shakiness">24%</output></span>
+            <input type="range" id="shakiness" min="0" max="100" value="24" />
+          </label>
+          <label class="control">
+            <span class="control-label">Pen pressure <output data-output="pressure">58%</output></span>
+            <input type="range" id="pressure" min="0" max="100" value="58" />
+          </label>
+          <label class="control">
+            <span class="control-label">Pressure variation <output data-output="pressureVariation">36%</output></span>
+            <input type="range" id="pressureVariation" min="0" max="100" value="36" />
+          </label>
+          <label class="control">
+            <span class="control-label">Grip tension <output data-output="grip">44%</output></span>
+            <input type="range" id="grip" min="0" max="100" value="44" />
+          </label>
+          <label class="control">
+            <span class="control-label">Wrist angle <output data-output="wristAngle">−5°</output></span>
+            <input type="range" id="wristAngle" min="-25" max="25" value="-5" />
+          </label>
+          <label class="control">
+            <span class="control-label">Natural slant <output data-output="slant">7°</output></span>
+            <input type="range" id="slant" min="-18" max="24" value="7" />
+          </label>
+          <label class="control">
+            <span class="control-label">Letter connection <output data-output="connection">38%</output></span>
+            <input type="range" id="connection" min="0" max="100" value="38" />
+          </label>
+          <label class="control toggle-control" for="paperTextureToggle">
+            <span>
+              <strong>Fine‑grain texture</strong>
+              <small>Adds subtle pulp‑like grain to each page</small>
+            </span>
+            <input type="checkbox" id="paperTextureToggle" checked />
+            <span class="toggle" aria-hidden="true"></span>
+          </label>
+          <input type="hidden" id="paperTexture" value="fine" />
+          <label class="toggle-control" for="wristSupport">
+            <span>
+              <strong>Wrist support</strong>
+              <small>Stabilizes long-range drift</small>
+            </span>
+            <input type="checkbox" id="wristSupport" checked />
+            <span class="toggle" aria-hidden="true"></span>
+          </label>
+        </div>
+
+        <div class="tab-panel" id="panel-materials" role="tabpanel" aria-labelledby="tab-materials" data-panel="materials" hidden>
+          <label class="control">
+            <span class="control-label">Pen mechanism</span>
+            <select id="penKind">
+              <option value="ballpoint">Ballpoint</option>
+              <option value="fountain">Fountain nib</option>
+            </select>
+          </label>
+          <label class="control">
+            <span class="control-label">Writing style</span>
+            <select id="writingStyle">
+              <option value="cursive">Cursive</option>
+              <option value="print">Print (non-cursive)</option>
+            </select>
+          </label>
+          <label class="control">
+            <span class="control-label">Cursive detail</span>
+            <select id="construction">
+              <option value="simplex">Simple strokes</option>
+              <option value="complex">Detailed strokes</option>
+            </select>
+          </label>
+          <label class="control">
+            <span class="control-label">Paper stock</span>
+            <select id="paper">
+              <option value="notebook">Ruled notebook</option>
+              <option value="ivory">Warm ivory</option>
+              <option value="bright">Bright uncoated</option>
+              <option value="recycled">Rough recycled</option>
+            </select>
+          </label>
+          <label class="control">
+            <span class="control-label">Reservoir level <output data-output="reservoir">88%</output></span>
+            <input type="range" id="reservoir" min="8" max="100" value="88" />
+          </label>
+          <label class="control color-control">
+            <span class="control-label">Ink or lead color</span>
+            <span class="color-field"><input type="color" id="inkColor" value="#233d4d" /><code id="colorCode">#233D4D</code></span>
+          </label>
+          <div class="material-readout" id="materialReadout">
+            <span>Current model</span>
+            <strong>Ballpoint · simplex cursive · ruled paper</strong>
+            <small>Every letter instance receives a unique stroke variation.</small>
+          </div>
+        </div>
+
+        <div class="tab-panel profiles-panel" id="panel-profiles" role="tabpanel" aria-labelledby="tab-profiles" data-panel="profiles" hidden>
+          <form class="profile-form" id="profileForm">
+            <label for="profileName">Save current setup</label>
+            <div class="profile-input-row">
+              <input id="profileName" name="profileName" maxlength="48" placeholder="Profile name" autocomplete="off" required />
+              <button class="button button-primary" type="submit">Save profile</button>
+            </div>
+            <small>Profiles stay in this browser. They contain parameters only, never handwriting samples.</small>
+          </form>
+          <div class="profile-list-wrap">
+            <span class="control-label">Saved locally</span>
+            <div class="profile-list" id="profileList" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="Text and handwriting preview">
+        <article class="pane source-pane">
+          <header class="pane-header">
+            <div>
+              <span class="pane-index">A</span>
+              <div><p>Source text</p><small>Type, paste, or open .txt / .md</small></div>
+            </div>
+            <div class="source-actions">
+              <input type="file" id="sourceFile" aria-label="Choose a text or Markdown file" accept=".txt,.md,.markdown,text/plain,text/markdown" hidden />
+              <button type="button" class="text-button" id="importButton">
+                <svg class="inline-icon" aria-hidden="true" focusable="false"><use href="./src/assets/ui-icons.svg#sl-icon-export"></use></svg>
+                Open file
+              </button>
+              <button type="button" class="text-button" id="clearButton">Clear</button>
+            </div>
+          </header>
+          <div class="source-field">
+            <textarea id="sourceText" spellcheck="true" aria-label="Source text">Field note 07, the weather shifted before noon.
+
+Synthetic handwriting helps us test reading systems without collecting anyone's private documents.</textarea>
+            <div class="textarea-grid" aria-hidden="true"></div>
+          </div>
+          <footer class="pane-footer">
+            <span><b id="characterCount">0</b> / 50,000 characters</span>
+            <span>Processed on-device</span>
+          </footer>
+        </article>
+
+        <div class="flow-indicator" aria-hidden="true"><span>→</span></div>
+
+        <article class="pane preview-pane">
+          <header class="pane-header">
+            <div>
+              <span class="pane-index pane-index-output">B</span>
+              <div><p>Synthetic page</p><small id="previewSubtitle">Pen · seed 43182</small></div>
+            </div>
+            <div class="preview-tools">
+              <div class="page-control" aria-label="Preview page">
+                <button type="button" class="page-button" id="previousPageButton" aria-label="Previous page">‹</button>
+                <span id="pagePosition">1 / 1</span>
+                <button type="button" class="page-button" id="nextPageButton" aria-label="Next page">›</button>
+              </div>
+              <div class="zoom-control" aria-label="Preview zoom">
+                <button type="button" class="zoom-button is-active" data-zoom="fit" aria-pressed="true">Fit</button>
+                <button type="button" class="zoom-button" data-zoom="actual" aria-pressed="false">100%</button>
+              </div>
+              <span class="live-badge"><i></i> Live</span>
+            </div>
+          </header>
+          <div class="canvas-stage" id="canvasStage">
+            <div class="page-shadow">
+              <canvas id="outputCanvas" aria-label="Generated synthetic handwriting preview"></canvas>
+            </div>
+          </div>
+          <footer class="pane-footer">
+            <span><b id="lineCount">0</b> rendered lines · <b id="pageCount">1</b> page</span>
+            <span id="renderTime">Render pending</span>
+          </footer>
+        </article>
+      </section>
+
+      <footer class="system-strip">
+        <span class="system-label">SL / 01</span>
+        <span>No handwriting uploads</span>
+        <span>No identity conditioning</span>
+        <span>Public-domain vector strokes</span>
+        <span class="system-message" id="systemMessage" role="status" aria-live="polite">Parameters synchronized</span>
+      </footer>
+    </main>
+
+    <section class="print-document" id="printDocument" aria-hidden="true"></section>
+
+    <dialog id="metadataDialog" class="metadata-dialog">
+      <form method="dialog" class="dialog-frame">
+        <header>
+          <div><p class="eyebrow">Training record</p><h2>Sample metadata</h2></div>
+          <button class="icon-button" value="close" aria-label="Close dialog">×</button>
+        </header>
+        <p class="dialog-copy">Export a companion JSON record describing the generator settings. Source text is represented only by its character count.</p>
+        <pre id="metadataPreview" tabindex="0" role="region" aria-label="Synthetic sample metadata JSON"></pre>
+        <footer>
+          <button class="button button-ghost" value="close">Cancel</button>
+          <button class="button button-primary" type="button" id="downloadMetadataButton">Download JSON</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

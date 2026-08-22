@@ -1,0 +1,11 @@
+node_modules/
+playwright-report/
+test-results/
+test-artifacts/
+backup_*.zip
+user-instructions.md
+docs/open-source-hosting-plan.md
+.agents/
+.codex/
+*.log
+.DS_Store

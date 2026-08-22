@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use Scribble Lab in research or teaching, please cite it using this metadata."
+title: "Scribble Lab"
+abstract: "A local-first procedural generator for identity-free synthetic handwriting with cursive and print styles, tunable writer profiles, and natural character variation."
+type: software
+authors:
+  - family-names: "Bateman"
+    given-names: "Matthew"
+version: 1.0.0
+date-released: 2026-08-22
+license: AGPL-3.0-only
+repository-code: "https://github.com/matt-bat/scribble-lab"
+url: "https://github.com/matt-bat/scribble-lab"
+keywords:
+  - synthetic handwriting
+  - procedural generation
+  - optical character recognition
+  - local-first software
+  - accessibility

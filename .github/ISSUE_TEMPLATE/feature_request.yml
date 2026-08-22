@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest an identity-free improvement to Scribble Lab
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Scribble Lab does not accept features for handwriting imitation, signature generation, writer matching, tracing, or identity conditioning.
+  - type: textarea
+    id: need
+    attributes:
+      label: What need would this address?
+      description: Describe the user problem before describing the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed approach
+      description: Explain how the feature would fit the local and identity-free design.
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Project boundary
+      options:
+        - label: This request does not require handwriting, signature, image, or font samples from a real person.
+          required: true
+        - label: This request does not add writer identification, matching, tracing, or signature generation.
+          required: true

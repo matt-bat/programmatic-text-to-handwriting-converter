@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.png binary
+src/assets/hershey-script-data.js linguist-generated=true
+src/assets/hershey-print-data.js linguist-generated=true

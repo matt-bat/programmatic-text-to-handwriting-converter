@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="slf-title">
+  <title id="slf-title">Scribble Lab</title>
+  <rect x="2" y="2" width="28" height="28" rx="8" fill="#B96846"/>
+  <path d="M 8 6 H 19 L 25 12 V 25 H 8 Z" fill="#F3EFE5" stroke="#252C29" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 19 6 V 12 H 25" fill="#D8CFBE" stroke="#252C29" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M 8 24 C 12 19 15 26 20 21" fill="none" stroke="#58766C" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="slm-title slm-desc">
+  <title id="slm-title">Scribble Lab mark</title>
+  <desc id="slm-desc">A fountain pen nib draws a loose line across a folded sheet of paper.</desc>
+  <g id="slm-folio">
+    <path d="M 13 9 Q 13 5 17 5 H 43 L 55 17 V 49 Q 55 57 47 57 H 17 Q 9 57 9 49 V 13 Q 9 9 13 9 Z"
+          fill="#B96846" transform="rotate(-3 32 31)"/>
+    <path d="M 17 6 H 42 L 53 17 V 49 Q 53 55 47 55 H 17 Q 11 55 11 49 V 12 Q 11 6 17 6 Z"
+          fill="#F3EFE5" stroke="#242B28" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 42 6 V 14 Q 42 17 45 17 H 53" fill="#DED5C3" stroke="#242B28" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 19 23 H 40 M 19 29 H 35" fill="none" stroke="#B8B0A1" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <g id="slm-nib" transform="rotate(-42 31 39)">
+    <path d="M 27 25 H 35 L 37 43 L 31 51 L 25 43 Z" fill="#58766C" stroke="#242B28" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 31 29 V 45" fill="none" stroke="#F3EFE5" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="31" cy="40" r="2.1" fill="#242B28"/>
+  </g>
+  <path id="slm-ink-line" d="M 16 48 C 22 43 25 51 30 47 S 40 44 47 48" fill="none" stroke="#242B28" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,51 @@
+name: Bug report
+description: Report a reproducible problem in Scribble Lab
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve Scribble Lab. Do not attach private documents, handwriting samples, or signatures.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Explain the behavior and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest safe example that reproduces the problem.
+      placeholder: |
+        1. Open Scribble Lab
+        2. Select...
+        3. Observe...
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Firefox 142
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+      placeholder: Windows 11
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed private documents, personal handwriting, signatures, and sensitive information.
+          required: true
+        - label: This report does not disclose a security vulnerability that should be reported privately.
+          required: true
