@@ -178,7 +178,10 @@ export function varyStrokePaths(paths, amount, rng) {
 
 export function segmentGraphemes(text) {
   if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-    return [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)].map((part) => part.segment);
+    const graphemes = [];
+    const segments = new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text);
+    for (const part of segments) graphemes.push(part.segment);
+    return graphemes;
   }
   return Array.from(text);
 }

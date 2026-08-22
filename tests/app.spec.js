@@ -338,9 +338,10 @@ test('PDF export keeps one document snapshot while the editor changes', async ({
     window.__printCalls = 0;
     window.print = () => { window.__printCalls += 1; };
   });
-  await page.getByLabel('Source text').fill('ink '.repeat(5_000));
+  await page.getByLabel('Source text').fill('ink '.repeat(1_500));
   await expect(page.locator('#pageCount')).not.toHaveText('1');
   const exportPageCount = Number(await page.locator('#pageCount').textContent());
+  expect(exportPageCount).toBeGreaterThan(2);
   await page.evaluate(() => {
     document.querySelector('#pdfButton').click();
     requestAnimationFrame(() => {

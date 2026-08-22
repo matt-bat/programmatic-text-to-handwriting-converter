@@ -24,4 +24,5 @@ Initial public release.
 - Kept PDF export bound to one document snapshot during editing
 - Preserved intraword underscores during Markdown conversion
 - Aligned the editor limit with grapheme-aware character counting
+- Kept 50,000-character segmentation memory-bounded on Node.js 20
 - Released the project under GNU AGPL version 3 only
