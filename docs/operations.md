@@ -3,7 +3,7 @@
 ## Local start
 
 ```bash
-npm install
+npm ci --ignore-scripts
 npm start
 ```
 
@@ -15,6 +15,13 @@ Run syntax checks and deterministic unit tests first:
 
 ```bash
 npm run check
+```
+
+Verify the locked dependency advisory report and registry signatures:
+
+```bash
+npm audit --audit-level=high
+npm audit signatures
 ```
 
 Run the browser-visible workflow tests second:
@@ -32,7 +39,7 @@ Reviewed desktop, motion-control, and mobile screenshots are retained in `docs/s
 If Playwright reports that its executable does not exist, install the pinned Chromium runtime:
 
 ```bash
-npx playwright install chromium firefox webkit
+./node_modules/.bin/playwright install chromium firefox webkit
 ```
 
 ## Recovery

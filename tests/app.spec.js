@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFile } from 'node:fs/promises';
+import { MAX_SOURCE_CODE_UNITS } from '../src/document-import.js';
 
 async function canvasFingerprint(page) {
   return page.locator('#outputCanvas').evaluate((canvas) => {
@@ -313,6 +314,18 @@ test('Markdown and text files import locally with human-readable formatting', as
   await expect(page.locator('#characterCount')).toHaveText('77');
 });
 
+test('file import rejects pathological raw character sequences before rendering', async ({ page }) => {
+  const previousSource = await page.getByLabel('Source text').inputValue();
+  await page.locator('#sourceFile').setInputFiles({
+    name: 'pathological.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from(`a${'\u0301'.repeat(MAX_SOURCE_CODE_UNITS)}`),
+  });
+  await expect(page.locator('#systemMessage')).toHaveText('File contains unusually long character data');
+  await expect(page.getByLabel('Source text')).toHaveValue(previousSource);
+  await expect(page.locator('#engineStatus')).toHaveText('Ready');
+});
+
 test('Export PDF prepares every document page and opens a print-only document', async ({ page }) => {
   await page.evaluate(() => {
     window.__printCalls = 0;
@@ -464,6 +477,32 @@ test('source limit counts graphemes instead of UTF-16 code units', async ({ page
   await source.fill('a'.repeat(50_001));
   await expect(source).toHaveValue('a'.repeat(50_000));
   await expect(page.locator('#systemMessage')).toHaveText('Source limited to 50,000 characters');
+});
+
+test('pathological graphemes stay within the raw processing bound', async ({ page }) => {
+  const source = page.getByLabel('Source text');
+  await source.evaluate((element, limit) => {
+    element.value = `a${'\u0301'.repeat(limit)}`;
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+  }, MAX_SOURCE_CODE_UNITS);
+  await expect.poll(() => source.evaluate((element) => element.value.length)).toBe(MAX_SOURCE_CODE_UNITS);
+  await expect(page.locator('#systemMessage')).toHaveText('Source limited to a safe processing size');
+  await expect(page.locator('#characterCount')).toHaveText('1');
+});
+
+test('untrusted text and profile names remain inert under the page security policy', async ({ page }) => {
+  const payload = '<img src=x onerror=window.__scribbleXss=1>';
+  await page.getByLabel('Source text').fill(payload);
+  await page.getByRole('tab', { name: /profiles/i }).click();
+  await page.locator('#profileName').fill(payload);
+  await page.getByRole('button', { name: 'Save profile' }).click();
+
+  await expect(page.locator('#profileList img')).toHaveCount(0);
+  expect(await page.evaluate(() => window.__scribbleXss)).toBeUndefined();
+  const policy = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
+  expect(policy).toContain("script-src 'self'");
+  expect(policy).toContain("connect-src 'none'");
+  expect(policy).toContain("require-trusted-types-for 'script'");
 });
 
 test('meaningful parameter changes produce visibly distinct handwriting', async ({ page }) => {

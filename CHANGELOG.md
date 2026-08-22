@@ -2,6 +2,16 @@
 
 Notable changes to Scribble Lab are recorded here.
 
+## Unreleased
+
+### Security
+
+- Added a restrictive browser Content Security Policy and removed the remaining HTML injection sink
+- Bounded pathological raw text, combining-mark, and saved-profile processing
+- Pinned CI actions to immutable revisions and disabled persisted checkout credentials
+- Disabled dependency install scripts in CI and added advisory auditing
+- Expanded secret-file ignore rules and repository security automation
+
 ## 1.0.0, 2026-08-22
 
 Initial public release.

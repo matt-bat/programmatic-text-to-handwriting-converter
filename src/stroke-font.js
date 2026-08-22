@@ -46,6 +46,7 @@ const ACCENT_PATHS = Object.freeze({
 });
 
 const parsedCache = new Map();
+const MAX_GRAPHEME_CODE_POINTS = 64;
 
 function parsePathData(pathData) {
   const tokens = pathData.match(/[ML]|-?\d+(?:\.\d+)?/g) || [];
@@ -76,15 +77,17 @@ function parsePathData(pathData) {
 function resolveCharacter(grapheme) {
   const mapped = SMART_ASCII[grapheme] ?? grapheme;
   if (mapped === ' ' || mapped === '\t') return { base: ' ', marks: [] };
-  const decomposed = [...mapped.normalize('NFD')];
-  const base = decomposed.find((character) => {
+  let base = '?';
+  const marks = [];
+  let inspected = 0;
+  for (const character of mapped.normalize('NFD')) {
+    if (inspected >= MAX_GRAPHEME_CODE_POINTS) break;
+    inspected += 1;
     const code = character.codePointAt(0);
-    return code >= 33 && code <= 126;
-  }) ?? '?';
-  return {
-    base,
-    marks: decomposed.filter((character) => ACCENT_PATHS[character]),
-  };
+    if (base === '?' && code >= 33 && code <= 126) base = character;
+    if (ACCENT_PATHS[character]) marks.push(character);
+  }
+  return { base, marks };
 }
 
 export function getStrokeGlyph(grapheme, construction = 'simplex', writingStyle = 'cursive', variantIndex = 0) {

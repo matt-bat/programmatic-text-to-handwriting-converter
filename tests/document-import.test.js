@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   MAX_SOURCE_CHARACTERS,
+  MAX_SOURCE_CODE_UNITS,
   formatMarkdownForHandwriting,
   sourceKindFromFile,
 } from '../src/document-import.js';
@@ -59,4 +60,5 @@ test('supported source files are identified without trusting MIME metadata alone
   assert.equal(sourceKindFromFile({ name: 'notes.pdf', type: 'application/pdf' }), null);
   assert.equal(sourceKindFromFile({ name: 'notes.pdf', type: '' }), null);
   assert.equal(MAX_SOURCE_CHARACTERS, 50_000);
+  assert.equal(MAX_SOURCE_CODE_UNITS, 200_000);
 });

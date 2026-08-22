@@ -1,4 +1,5 @@
 export const MAX_SOURCE_CHARACTERS = 50_000;
+export const MAX_SOURCE_CODE_UNITS = 200_000;
 export const MAX_SOURCE_FILE_BYTES = 1_000_000;
 
 function stripInlineMarkdown(line) {

@@ -22,6 +22,10 @@ You should receive an acknowledgement through GitHub within seven days. Please a
 
 The official application processes text locally and makes no runtime network requests. It has no authentication system, server database, telemetry, handwriting upload, font upload, image input, signature mode, or writer matching feature.
 
+The browser entry point uses a restrictive Content Security Policy. Untrusted text is rendered to Canvas or assigned through text-only DOM APIs. Source text, imported files, combining sequences, and saved profiles have explicit processing bounds.
+
+The public repository uses read-only workflow permissions, immutable action revisions, dependency auditing, Dependabot alerts and security updates, secret scanning with push protection, CodeQL default scanning, private vulnerability reporting, and protection against force pushes or deletion of `main`.
+
 Generated PDFs contain the source text supplied by the user. Users remain responsible for storing and sharing exported files safely.
 
 The safety-oriented feature scope is not a sandbox for modified source code. Report attempts to bypass the official project's boundaries when they affect the distributed application or its documented behavior.

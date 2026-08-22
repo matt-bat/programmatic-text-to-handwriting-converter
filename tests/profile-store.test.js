@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  MAX_PROFILE_STORAGE_CODE_UNITS,
   PROFILE_STORAGE_KEY,
   readProfiles,
   removeProfile,
@@ -20,6 +21,13 @@ function fakeStorage(initial = {}) {
 
 test('profile store recovers safely from invalid browser data', () => {
   const storage = fakeStorage({ [PROFILE_STORAGE_KEY]: '{not-json' });
+  assert.deepEqual(readProfiles(storage), []);
+});
+
+test('profile store rejects unexpectedly large persisted data before parsing', () => {
+  const storage = fakeStorage({
+    [PROFILE_STORAGE_KEY]: `["${'x'.repeat(MAX_PROFILE_STORAGE_CODE_UNITS)}"]`,
+  });
   assert.deepEqual(readProfiles(storage), []);
 });
 

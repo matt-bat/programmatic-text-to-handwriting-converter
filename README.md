@@ -84,6 +84,8 @@ Markdown headings, lists, task markers, links, quotes, tables, emphasis, and fen
 - Export metadata records counts and generator settings, not source text.
 - The runtime makes no external network requests.
 - No handwriting or identity reference can be uploaded.
+- A restrictive browser security policy blocks remote scripts, connections, frames, and embedded objects.
+- Character, raw text, file, and saved-profile bounds limit accidental or hostile memory use.
 
 Generated PDF files contain the text you supplied. Store and share those files according to the sensitivity of that text.
 
@@ -98,7 +100,7 @@ npm run check
 Run the complete browser workflow suite:
 
 ```bash
-npx playwright install chromium firefox webkit
+./node_modules/.bin/playwright install chromium firefox webkit
 npm run test:browser
 ```
 

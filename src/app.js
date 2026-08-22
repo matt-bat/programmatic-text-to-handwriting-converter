@@ -7,6 +7,7 @@ import {
 } from './handwriting-engine.js';
 import {
   MAX_SOURCE_CHARACTERS,
+  MAX_SOURCE_CODE_UNITS,
   MAX_SOURCE_FILE_BYTES,
   formatMarkdownForHandwriting,
   sourceKindFromFile,
@@ -88,6 +89,13 @@ function collectProfile(overrides = {}) {
 
 function setSystemMessage(message) {
   elements.systemMessage.textContent = message;
+}
+
+function truncateUtf16Safely(text, limit) {
+  let end = limit;
+  const lastCodeUnit = text.charCodeAt(end - 1);
+  if (lastCodeUnit >= 0xd800 && lastCodeUnit <= 0xdbff) end -= 1;
+  return text.slice(0, end);
 }
 
 function applyReadabilityPreset({ announce = true, renderDelay = 0 } = {}) {
@@ -191,9 +199,11 @@ function renderProfileList() {
     card.className = 'profile-card';
     const loadButton = document.createElement('button');
     loadButton.type = 'button';
-    loadButton.innerHTML = `<strong></strong><small></small>`;
-    loadButton.querySelector('strong').textContent = profile.name;
-    loadButton.querySelector('small').textContent = `${profile.instrument} · ${profile.writingStyle} · ${profile.seed}`;
+    const profileName = document.createElement('strong');
+    const profileDetails = document.createElement('small');
+    profileName.textContent = profile.name;
+    profileDetails.textContent = `${profile.instrument} · ${profile.writingStyle} · ${profile.seed}`;
+    loadButton.append(profileName, profileDetails);
     loadButton.setAttribute('aria-label', `Load ${profile.name} profile`);
     loadButton.addEventListener('click', () => {
       applyProfile(profile);
@@ -338,6 +348,10 @@ for (const id of PARAMETER_IDS) {
 }
 
 elements.sourceText.addEventListener('input', () => {
+  if (elements.sourceText.value.length > MAX_SOURCE_CODE_UNITS) {
+    elements.sourceText.value = truncateUtf16Safely(elements.sourceText.value, MAX_SOURCE_CODE_UNITS);
+    setSystemMessage('Source limited to a safe processing size');
+  }
   if (elements.sourceText.value.length > MAX_SOURCE_CHARACTERS) {
     const graphemes = segmentGraphemes(elements.sourceText.value);
     if (graphemes.length > MAX_SOURCE_CHARACTERS) {
@@ -372,7 +386,17 @@ elements.sourceFile.addEventListener('change', async () => {
   elements.engineStatus.textContent = 'Reading file';
   try {
     const raw = (await file.text()).replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+    if (raw.length > MAX_SOURCE_CODE_UNITS) {
+      setSystemMessage('File contains unusually long character data');
+      elements.engineStatus.textContent = 'Ready';
+      return;
+    }
     const prepared = kind === 'markdown' ? formatMarkdownForHandwriting(raw) : raw;
+    if (prepared.length > MAX_SOURCE_CODE_UNITS) {
+      setSystemMessage('File contains unusually long character data');
+      elements.engineStatus.textContent = 'Ready';
+      return;
+    }
     const characterCount = segmentGraphemes(prepared).length;
     if (characterCount > MAX_SOURCE_CHARACTERS) {
       setSystemMessage(`File exceeds the ${MAX_SOURCE_CHARACTERS.toLocaleString()} character limit`);

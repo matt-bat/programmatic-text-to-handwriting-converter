@@ -1,11 +1,14 @@
 import { DEFAULT_PROFILE, normalizeProfile } from './handwriting-engine.js';
 
 export const PROFILE_STORAGE_KEY = 'scribble-lab.profiles.v1';
+export const MAX_PROFILE_STORAGE_CODE_UNITS = 64_000;
 
 export function readProfiles(storage = globalThis.localStorage) {
   if (!storage) return [];
   try {
-    const parsed = JSON.parse(storage.getItem(PROFILE_STORAGE_KEY) || '[]');
+    const stored = storage.getItem(PROFILE_STORAGE_KEY) || '[]';
+    if (stored.length > MAX_PROFILE_STORAGE_CODE_UNITS) return [];
+    const parsed = JSON.parse(stored);
     if (!Array.isArray(parsed)) return [];
     return parsed
       .filter((profile) => profile && typeof profile === 'object')

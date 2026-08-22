@@ -41,6 +41,13 @@ test('common Latin diacritics keep the base glyph and add accent strokes', () =>
   assert.ok(accented.marks.length > 0);
 });
 
+test('pathological combining sequences have bounded accent work', () => {
+  const glyph = getStrokeGlyph(`a${'\u0301'.repeat(10_000)}`, 'simplex');
+  assert.equal(glyph.base, 'a');
+  assert.ok(glyph.marks.length > 0);
+  assert.ok(glyph.marks.length <= 63);
+});
+
 test('smart punctuation and unknown symbols receive safe deterministic fallbacks', () => {
   assert.deepEqual(getStrokeGlyph('—').paths, getStrokeGlyph('-').paths);
   assert.deepEqual(getStrokeGlyph('🧪').paths, getStrokeGlyph('?').paths);
