@@ -2,8 +2,23 @@ export const MAX_SOURCE_CHARACTERS = 50_000;
 export const MAX_SOURCE_CODE_UNITS = 200_000;
 export const MAX_SOURCE_FILE_BYTES = 1_000_000;
 
+function stripHtmlTags(text) {
+  let output = '';
+  for (let index = 0; index < text.length; index += 1) {
+    if (text[index] === '<' && /[A-Za-z/!?]/.test(text[index + 1] || '')) {
+      const closingBracket = text.indexOf('>', index + 2);
+      if (closingBracket !== -1) {
+        index = closingBracket;
+        continue;
+      }
+    }
+    output += text[index];
+  }
+  return output;
+}
+
 function stripInlineMarkdown(line) {
-  return line
+  const formatted = line
     .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ($2)')
     .replace(/<((?:https?:\/\/|mailto:)[^>]+)>/g, '$1')
@@ -12,8 +27,8 @@ function stripInlineMarkdown(line) {
     .replace(/(~~)(.*?)\1/g, '$2')
     .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '$1')
     .replace(/(?<![\w_])_([^_\n]+)_(?![\w_])/g, '$1')
-    .replace(/\\([\\`*{}\[\]()#+\-.!_>])/g, '$1')
-    .replace(/<[^>]+>/g, '');
+    .replace(/\\([\\`*{}\[\]()#+\-.!_>])/g, '$1');
+  return stripHtmlTags(formatted);
 }
 
 export function formatMarkdownForHandwriting(markdown) {

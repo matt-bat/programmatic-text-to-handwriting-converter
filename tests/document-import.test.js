@@ -53,6 +53,12 @@ test('intraword underscores remain intact while emphasis markers are removed', (
   );
 });
 
+test('HTML formatting is removed without creating executable tag text', () => {
+  assert.equal(formatMarkdownForHandwriting('<strong>Field note</strong>'), 'Field note');
+  assert.equal(formatMarkdownForHandwriting('<scr<script>ipt>alert(1)</script>'), 'ipt>alert(1)');
+  assert.equal(formatMarkdownForHandwriting('Keep 1 < 2 and 3 > 2 readable.'), 'Keep 1 < 2 and 3 > 2 readable.');
+});
+
 test('supported source files are identified without trusting MIME metadata alone', () => {
   assert.equal(sourceKindFromFile({ name: 'notes.md', type: '' }), 'markdown');
   assert.equal(sourceKindFromFile({ name: 'notes.markdown', type: 'application/octet-stream' }), 'markdown');
