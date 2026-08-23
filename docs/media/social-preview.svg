@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">Programmatic Text-to-Handwriting Converter</title>
+  <desc id="desc">Project title and features beside a real Scribble Lab application screenshot.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151a17"/>
+      <stop offset="1" stop-color="#26312b"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#8ca097" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+    <clipPath id="screen-clip">
+      <rect x="724" y="70" width="492" height="500" rx="20"/>
+    </clipPath>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000000" flood-opacity="0.38"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#background)"/>
+  <rect width="1280" height="640" fill="url(#grid)"/>
+  <rect x="0" y="0" width="14" height="640" fill="#d68761"/>
+
+  <image href="../../src/assets/scribble-lab-mark.svg" x="72" y="68" width="76" height="76"/>
+  <text x="172" y="100" fill="#b8c8c0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" letter-spacing="2">SCRIBBLE LAB</text>
+  <text x="172" y="132" fill="#f3efe5" font-family="Arial, Helvetica, sans-serif" font-size="19">Local browser renderer</text>
+
+  <text x="72" y="236" fill="#f3efe5" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="700">Programmatic</text>
+  <text x="72" y="304" fill="#f3efe5" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="700">Text to Handwriting</text>
+  <text x="72" y="357" fill="#adc2b8" font-family="Arial, Helvetica, sans-serif" font-size="25">Seeded vector strokes with natural variation</text>
+
+  <g font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">
+    <rect x="72" y="408" width="116" height="44" rx="22" fill="#d68761"/>
+    <text x="101" y="437" fill="#18201c">NO AI</text>
+    <rect x="202" y="408" width="218" height="44" rx="22" fill="#aec4ba"/>
+    <text x="228" y="437" fill="#18201c">VANILLA JAVASCRIPT</text>
+    <rect x="434" y="408" width="156" height="44" rx="22" fill="#f0e8d7"/>
+    <text x="462" y="437" fill="#18201c">CANVAS 2D</text>
+  </g>
+
+  <text x="72" y="518" fill="#f3efe5" font-family="Arial, Helvetica, sans-serif" font-size="21">Cursive and print  |  Markdown  |  PDF export</text>
+  <text x="72" y="556" fill="#a9b9b1" font-family="Arial, Helvetica, sans-serif" font-size="18">No models, training data, backend, or runtime network calls</text>
+
+  <g filter="url(#shadow)">
+    <rect x="712" y="58" width="516" height="524" rx="26" fill="#0e1210" stroke="#6f8078" stroke-width="2"/>
+    <image href="../screenshots/scribble-lab-desktop.png" x="724" y="70" width="492" height="504" preserveAspectRatio="xMidYMin slice" clip-path="url(#screen-clip)"/>
+  </g>
+</svg>

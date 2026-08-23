@@ -1,6 +1,13 @@
 # Contributing to Scribble Lab
 
-Thank you for helping improve Scribble Lab. Contributions should strengthen natural synthetic variation, accessibility, reliability, documentation, privacy, or the identity-free safety boundary.
+Thanks for taking the time to help. Useful contributions improve rendering, accessibility, reliability, documentation, privacy, or the identity-free safety boundary.
+
+The focused guides cover the details:
+
+- [Local development](docs/contributing/development.md)
+- [Rendering changes](docs/contributing/rendering-changes.md)
+- [Documentation changes](docs/contributing/documentation.md)
+- [Current roadmap](ROADMAP.md)
 
 ## Before opening an issue
 
@@ -12,7 +19,7 @@ Thank you for helping improve Scribble Lab. Contributions should strengthen natu
 ## Local setup
 
 ```bash
-npm install
+npm ci
 npm start
 ```
 
@@ -46,3 +53,5 @@ npx playwright install chromium firefox webkit
 The official project will not accept handwriting uploads, signature generation, writer identification, reference-image conditioning, style extraction from a person, or controls intended to imitate identifiable writing.
 
 By contributing, you agree that your contribution is licensed under the PolyForm Noncommercial License 1.0.0 and that you have the right to submit it. Contributions may be used, modified, and redistributed only for purposes permitted by that license.
+
+If you are unsure whether an idea fits the project, start a GitHub Discussion before writing code. A short conversation can save both you and the maintainers time.

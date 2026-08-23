@@ -5,11 +5,12 @@
 <h1 align="center">Programmatic Text-to-Handwriting Converter</h1>
 
 <p align="center">
-  The Scribble Lab browser app converts text into naturally varied handwriting with programmed vector strokes—no AI model, machine learning, or handwriting training data.
+  The Scribble Lab browser app converts text into naturally varied handwriting with programmed vector strokes. It uses no AI model, machine learning, or handwriting training data.
 </p>
 
 <p align="center">
   <a href="https://github.com/matt-bat/programmatic-text-to-handwriting-converter/actions/workflows/ci.yml"><img alt="Continuous integration status" src="https://github.com/matt-bat/programmatic-text-to-handwriting-converter/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://matt-bat.github.io/programmatic-text-to-handwriting-converter/"><img alt="Open the live demo" src="https://img.shields.io/badge/demo-open%20in%20browser-58766c"></a>
   <a href="LICENSE"><img alt="PolyForm Noncommercial 1.0.0 license" src="https://img.shields.io/badge/license-PolyForm%20NC%201.0.0-6f5bd3"></a>
   <a href="https://ko-fi.com/matt0bat"><img alt="Support on Ko-fi" src="https://img.shields.io/badge/support-Ko--fi-f28c6f"></a>
 </p>
@@ -22,7 +23,9 @@ Here, *synthetic handwriting* simply means handwriting-like output rendered by s
 
 > **No AI is used to generate the handwriting.** The runtime contains no model weights, machine-learning library, training pipeline, inference step, prompt service, or generative-AI API. It never learns from handwriting samples. All generation happens locally through deterministic JavaScript math and Canvas 2D drawing commands.
 
-Because the generator is seeded, the same text, seed, and settings reproduce the same document. Selecting **New sample** changes the seed and produces a different—but still deterministic—writer and page.
+Because the generator is seeded, the same text, seed, and settings reproduce the same document. Selecting **New sample** changes the seed and produces a different but still deterministic writer and page.
+
+[Try the live browser demo](https://matt-bat.github.io/programmatic-text-to-handwriting-converter/) or follow the local setup below.
 
 ## Developer quick start
 
@@ -54,6 +57,8 @@ Run deterministic unit and syntax checks with `npm run check`. The full Playwrig
 11. **Preview or export.** The app renders only the selected preview page for responsiveness. PDF export takes one stable document snapshot, renders every page locally, and opens the browser print dialog.
 
 There is no probabilistic model hidden inside these steps. The apparent naturalness comes from several small, bounded variations working together at different scales.
+
+For a code-level walkthrough, read [How programmatic handwriting works](docs/articles/how-programmatic-handwriting-works.md).
 
 ## Where the natural variance comes from
 
@@ -91,6 +96,8 @@ Please use Scribble Lab for synthetic document creation, education, accessibilit
 - The same seed and parameters reproduce the same synthetic document across supported browsers.
 
 ## Preview
+
+![Scribble Lab switching between seeded cursive and print output](docs/media/programmatic-handwriting-demo.gif)
 
 | Desktop workspace | Hand motion controls |
 |:---:|:---:|
@@ -163,13 +170,17 @@ src/styles.css               Responsive Spatial Canvas visual system
 tests/                       Unit and cross-browser workflow tests
 docs/architecture.md         Rendering, privacy, and compatibility design
 docs/operations.md           Local operation and verification details
+docs/contributing/           Focused guides for development, rendering, and documentation changes
+docs/license-and-safety-rationale.md
+                             Why the project uses a noncommercial license and a strict safety boundary
+ROADMAP.md                   Current priorities and contribution ideas
 ```
 
 ## Contributing
 
 Bug reports, accessibility improvements, tests, documentation, and identity-free rendering improvements are welcome. Features that ingest or imitate a real person’s handwriting or signature are outside the project scope and will not be accepted.
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md), [SAFETY.md](SAFETY.md), and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before opening a pull request. Report sensitive security concerns through the private reporting instructions in [SECURITY.md](SECURITY.md).
+Start with [CONTRIBUTING.md](CONTRIBUTING.md), then use the focused [contributor guides](docs/contributing/README.md) for local development, rendering changes, and documentation work. The [roadmap](ROADMAP.md) lists useful areas to help. Read [SAFETY.md](SAFETY.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before opening a pull request. Report sensitive security concerns through the private reporting instructions in [SECURITY.md](SECURITY.md).
 
 For usage questions, examples, rendering experiments, and feature design, join [GitHub Discussions](https://github.com/matt-bat/programmatic-text-to-handwriting-converter/discussions). Use Issues for reproducible bugs and scoped implementation requests.
 
@@ -180,5 +191,7 @@ Copyright © 2026 Matthew Bateman.
 The current Scribble Lab source is available under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may use, study, modify, and share it only for purposes permitted by that license. Commercial use, profit-seeking paid access or hosting, inclusion in a paid product or service, and use for anticipated business revenue or profit are outside the license grant. The standard license also identifies permitted uses for qualifying noncommercial organizations. Redistributed copies must preserve the license and every `Required Notice:` line in [NOTICE.md](NOTICE.md), including credit to Matthew Bateman.
 
 This is a source-available license, not an OSI-approved open-source license. Copies already received under an earlier AGPL release remain governed by that earlier license. The new license applies to this revised version and later versions released under it.
+
+Read [Why this project uses a restrictive license](docs/license-and-safety-rationale.md) for the plain-language reasoning behind the license and safety boundaries. The license text remains the controlling document.
 
 The bundled Hershey coordinate data is public domain and documented separately in [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md). See [NOTICE.md](NOTICE.md) for attribution and project identity details.

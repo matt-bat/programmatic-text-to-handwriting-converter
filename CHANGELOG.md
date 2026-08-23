@@ -4,25 +4,11 @@ Notable changes to Scribble Lab are recorded here.
 
 ## Unreleased
 
-### Changed
+No unreleased changes yet.
 
-- Increased maximum readability while retaining the existing 0 to 100 control range and its established behavior through 90 percent
-- Reused Unicode segmentation and glyph measurements to reduce long-document style-switch latency
-- Relicensed this revised version under PolyForm Noncommercial 1.0.0, with required credit and no licensed commercial or profit-seeking paywalled use
-- Clarified that handwriting is generated programmatically from bundled vectors without AI, model inference, or handwriting training data
-- Added plain-language warranty, responsibility, and liability guidance that points to the controlling license terms
+## 1.0.0, 2026-08-23
 
-### Security
-
-- Added a restrictive browser Content Security Policy and removed the remaining HTML injection sink
-- Bounded pathological raw text, combining-mark, and saved-profile processing
-- Pinned CI actions to immutable revisions and disabled persisted checkout credentials
-- Disabled dependency install scripts in CI and added advisory auditing
-- Expanded secret-file ignore rules and repository security automation
-
-## 1.0.0, 2026-08-22
-
-Initial public release.
+First tagged public release.
 
 ### Added
 
@@ -36,6 +22,24 @@ Initial public release.
 - Paginated PDF preparation and privacy-safe JSON metadata export
 - Responsive keyboard-accessible interface
 - Deterministic unit and cross-browser workflow coverage
+- Developer contribution guides, roadmap, technical article, and license rationale
+
+### Changed
+
+- Increased maximum readability while retaining the existing 0 to 100 control range and its established behavior through 90 percent
+- Reused Unicode segmentation and glyph measurements to reduce long-document style-switch latency
+- Relicensed this revised version under PolyForm Noncommercial 1.0.0, with required credit and no licensed commercial or profit-seeking paywalled use
+- Clarified that handwriting is generated programmatically from bundled vectors without AI, model inference, or handwriting training data
+- Added plain-language warranty, responsibility, and liability guidance that points to the controlling license terms
+- Renamed the repository to `programmatic-text-to-handwriting-converter` and clarified its no-AI implementation
+
+### Security
+
+- Added a restrictive browser Content Security Policy and removed the remaining HTML injection sink
+- Bounded pathological raw text, combining-mark, and saved-profile processing
+- Pinned CI actions to immutable revisions and disabled persisted checkout credentials
+- Disabled dependency install scripts in CI and added advisory auditing
+- Expanded secret-file ignore rules and repository security automation
 
 ### Release hardening
 
@@ -43,4 +47,4 @@ Initial public release.
 - Preserved intraword underscores during Markdown conversion
 - Aligned the editor limit with grapheme-aware character counting
 - Kept 50,000-character segmentation memory-bounded on Node.js 20
-- Released the project under GNU AGPL version 3 only
+- Released the current revision under PolyForm Noncommercial 1.0.0

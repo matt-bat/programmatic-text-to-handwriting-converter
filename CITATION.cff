@@ -7,10 +7,10 @@ authors:
   - family-names: "Bateman"
     given-names: "Matthew"
 version: 1.0.0
-date-released: 2026-08-22
+date-released: 2026-08-23
 license: PolyForm-Noncommercial-1.0.0
 repository-code: "https://github.com/matt-bat/programmatic-text-to-handwriting-converter"
-url: "https://github.com/matt-bat/programmatic-text-to-handwriting-converter"
+url: "https://matt-bat.github.io/programmatic-text-to-handwriting-converter/"
 keywords:
   - synthetic handwriting
   - procedural generation

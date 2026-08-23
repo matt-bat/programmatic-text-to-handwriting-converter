@@ -6,7 +6,7 @@
   "type": "module",
   "author": "Matthew Bateman",
   "license": "PolyForm-Noncommercial-1.0.0",
-  "homepage": "https://github.com/matt-bat/programmatic-text-to-handwriting-converter#readme",
+  "homepage": "https://matt-bat.github.io/programmatic-text-to-handwriting-converter/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/matt-bat/programmatic-text-to-handwriting-converter.git"
@@ -32,6 +32,7 @@
   },
   "scripts": {
     "start": "python3 -m http.server 4173",
+    "capture:media": "node scripts/capture-media.mjs",
     "test": "node --test tests/*.test.js",
     "test:browser": "playwright test",
     "check": "node --check src/app.js && node --check src/handwriting-engine.js && node --check src/profile-store.js && node --test tests/*.test.js"
