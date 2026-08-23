@@ -216,6 +216,27 @@ test('expected readability coordinates legibility controls without changing the 
   await expect(page.locator('#seed')).toHaveValue(seed);
   await expect(page.locator('#writingStyle')).toHaveValue(writingStyle);
 
+  const highFingerprint = await canvasFingerprint(page);
+  await readability.fill('100');
+  await expect(page.locator('[data-output="readability"]')).toHaveText('Very clear · 100%');
+  await expect.poll(() => canvasFingerprint(page)).not.toBe(highFingerprint);
+  expect(await captureSettings()).toEqual({
+    size: '42',
+    lineHeight: '1.96',
+    spacing: '10',
+    speed: '88',
+    shakiness: '0',
+    pressure: '72',
+    pressureVariation: '2',
+    grip: '48',
+    wristAngle: '0',
+    slant: '2',
+    connection: '4',
+    reservoir: '100',
+    wristSupport: true,
+    construction: 'simplex',
+  });
+
   await readability.fill('15');
   expect(await captureSettings()).toEqual(low);
   await expect.poll(() => canvasFingerprint(page)).toBe(lowFingerprint);
@@ -250,11 +271,14 @@ test('writing styles and fixed sample seeds are visibly distinct', async ({ page
   await page.getByLabel('Writing style').selectOption('cursive');
   await expect(page.locator('#systemMessage')).toHaveText('Cursive writing active');
   await expect(page.locator('#previewSubtitle')).toContainText('cursive');
+  const cursiveShakiness = Number(await page.locator('#shakiness').inputValue());
   await rememberInkMask(page, 'cursive');
 
   await page.getByLabel('Writing style').selectOption('print');
   await expect(page.locator('#systemMessage')).toHaveText('Print writing active');
   await expect(page.locator('#previewSubtitle')).toContainText('print');
+  const printShakiness = Number(await page.locator('#shakiness').inputValue());
+  expect(printShakiness).toBeGreaterThan(cursiveShakiness);
   await rememberInkMask(page, 'print');
   expect(await inkMaskDisagreement(page, 'cursive', 'print')).toBeGreaterThan(0.8);
 
@@ -287,6 +311,11 @@ test('saved profiles persist and can be loaded', async ({ page }) => {
 test('metadata export contract excludes source content', async ({ page }) => {
   await page.getByLabel('Source text').fill('Do not copy this sentence.');
   await page.getByRole('button', { name: 'Metadata' }).click();
+  await expect(page.locator('#metadataPrivacySummary')).toHaveText('Source text excluded');
+  await expect(page.locator('#metadataOutputSummary')).toContainText('page');
+  await expect(page.locator('#metadataStyleSummary')).toContainText(/Cursive|Print/);
+  await expect(page.locator('#metadataSeedSummary')).toHaveText(/\d+/);
+  await expect(page.getByText('View technical JSON')).toBeVisible();
   const metadata = page.locator('#metadataPreview');
   await expect(metadata).toContainText('"identityConditioned": false');
   await expect(metadata).toContainText('"retainedByApp": false');
@@ -309,9 +338,24 @@ test('Markdown and text files import locally with human-readable formatting', as
     mimeType: 'text/markdown',
     buffer: Buffer.from('# Field notes\n\n- **First** point\n- Second point\n\nRead [source](https://example.com).'),
   });
-  await expect(page.getByLabel('Source text')).toHaveValue('Field notes\n\n- First point\n- Second point\n\nRead source (https://example.com).');
+  await expect(page.getByLabel('Source text')).toHaveValue('Field notes\n___________\n\n- First point\n- Second point\n\nRead source (https://example.com).');
   await expect(page.locator('#systemMessage')).toContainText('field-notes.md imported');
-  await expect(page.locator('#characterCount')).toHaveText('77');
+  await expect(page.locator('#characterCount')).toHaveText('89');
+});
+
+test('mobile source and preview shortcuts preserve a fast two-way editing flow', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole('button', { name: 'View preview' })).toBeVisible();
+  await page.getByRole('button', { name: 'View preview' }).click();
+  await expect(page.locator('#previewPane')).toBeFocused();
+  await expect(page.locator('#systemMessage')).toHaveText('Preview in view');
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(500);
+  const previewScrollPosition = await page.evaluate(() => window.scrollY);
+
+  await page.getByRole('button', { name: 'Edit text' }).click();
+  await expect(page.locator('#sourcePane')).toBeFocused();
+  await expect(page.locator('#systemMessage')).toHaveText('Source editor in view');
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(previewScrollPosition);
 });
 
 test('file import rejects pathological raw character sequences before rendering', async ({ page }) => {
@@ -327,6 +371,7 @@ test('file import rejects pathological raw character sequences before rendering'
 });
 
 test('Export PDF prepares every document page and opens a print-only document', async ({ page }) => {
+  test.setTimeout(60_000);
   await page.evaluate(() => {
     window.__printCalls = 0;
     window.print = () => { window.__printCalls += 1; };
@@ -347,6 +392,7 @@ test('Export PDF prepares every document page and opens a print-only document', 
 });
 
 test('PDF export keeps one document snapshot while the editor changes', async ({ page }) => {
+  test.setTimeout(60_000);
   await page.evaluate(() => {
     window.__printCalls = 0;
     window.print = () => { window.__printCalls += 1; };

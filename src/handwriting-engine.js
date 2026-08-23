@@ -53,6 +53,9 @@ const PEN_KINDS = new Set(['ballpoint', 'fountain']);
 const WRITING_STYLES = new Set(['cursive', 'print']);
 const CONSTRUCTIONS = new Set(['simplex', 'complex']);
 const PAPERS = new Set(['notebook', 'ivory', 'bright', 'recycled']);
+const GRAPHEME_SEGMENTER = typeof Intl !== 'undefined' && Intl.Segmenter
+  ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+  : null;
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -177,9 +180,9 @@ export function varyStrokePaths(paths, amount, rng) {
 }
 
 export function segmentGraphemes(text) {
-  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+  if (GRAPHEME_SEGMENTER) {
     const graphemes = [];
-    const segments = new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text);
+    const segments = GRAPHEME_SEGMENTER.segment(text);
     for (const part of segments) graphemes.push(part.segment);
     return graphemes;
   }
@@ -474,9 +477,14 @@ export function createHandwritingDocument(text, inputProfile = {}) {
   const profile = normalizeProfile(inputProfile);
   const writer = deriveWriterStyle(profile);
   const source = String(text || ' ');
+  const measuredGlyphWidths = new Map();
   let layoutIndex = 0;
   const layout = layoutText(source, (glyph) => {
-    const glyphSize = measureStrokeGlyph(glyph, profile.size, profile.construction, profile.writingStyle, layoutIndex);
+    let glyphSize = measuredGlyphWidths.get(glyph);
+    if (glyphSize === undefined) {
+      glyphSize = measureStrokeGlyph(glyph, profile.size, profile.construction, profile.writingStyle, layoutIndex);
+      measuredGlyphWidths.set(glyph, glyphSize);
+    }
     layoutIndex += 1;
     return glyphSize * writer.widthScale;
   }, {

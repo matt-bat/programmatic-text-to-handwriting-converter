@@ -30,7 +30,7 @@ Run the browser-visible workflow tests second:
 npm run test:browser
 ```
 
-The browser suite runs the same workflows in Chromium, Firefox, and WebKit. It covers live conversion, Markdown and text file import, grapheme-aware pagination through 50,000 characters, stable multi-page PDF preparation, bitmap and construction variation, readability presets, parameter and seed changes, repeated-letter consistency, profile persistence, JSON download, metadata privacy, preview zoom, responsive control layout, keyboard tab navigation, self-contained runtime requests, and automated WCAG A and AA checks across every tab and the metadata dialog. Failure traces and screenshots are written below `test-results/` and are ignored by version control.
+The browser suite runs the same workflows in Chromium, Firefox, and WebKit. It covers live conversion, Markdown and text file import, grapheme-aware pagination through 50,000 characters, stable multi-page PDF preparation, bitmap and construction variation, style-aware readability presets and their maximum-clarity endpoint, parameter and seed changes, repeated-letter consistency, profile persistence, JSON download, approachable metadata summaries, metadata privacy, preview zoom, mobile editor and preview shortcuts, responsive control layout, keyboard tab navigation, self-contained runtime requests, and automated WCAG A and AA checks across every tab and the metadata dialog. Failure traces and screenshots are written below `test-results/` and are ignored by version control.
 
 Reviewed desktop, motion-control, and mobile screenshots are retained in `docs/screenshots/` and linked from the README.
 

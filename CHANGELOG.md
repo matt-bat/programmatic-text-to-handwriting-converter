@@ -4,6 +4,14 @@ Notable changes to Scribble Lab are recorded here.
 
 ## Unreleased
 
+### Changed
+
+- Increased maximum readability while retaining the existing 0 to 100 control range and its established behavior through 90 percent
+- Reused Unicode segmentation and glyph measurements to reduce long-document style-switch latency
+- Relicensed this revised version under PolyForm Noncommercial 1.0.0, with required credit and no licensed commercial or profit-seeking paywalled use
+- Clarified that handwriting is generated programmatically from bundled vectors without AI, model inference, or handwriting training data
+- Added plain-language warranty, responsibility, and liability guidance that points to the controlling license terms
+
 ### Security
 
 - Added a restrictive browser Content Security Policy and removed the remaining HTML injection sink

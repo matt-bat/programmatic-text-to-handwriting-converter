@@ -45,4 +45,4 @@ npx playwright install chromium firefox webkit
 
 The official project will not accept handwriting uploads, signature generation, writer identification, reference-image conditioning, style extraction from a person, or controls intended to imitate identifiable writing.
 
-By contributing, you agree that your contribution is licensed under GNU AGPL version 3 only and that you have the right to submit it.
+By contributing, you agree that your contribution is licensed under the PolyForm Noncommercial License 1.0.0 and that you have the right to submit it. Contributions may be used, modified, and redistributed only for purposes permitted by that license.

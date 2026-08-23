@@ -38,6 +38,8 @@ const elements = Object.fromEntries(
     'clearButton', 'importButton', 'pdfButton', 'metadataButton', 'metadataDialog', 'metadataPreview',
     'downloadMetadataButton', 'profileForm', 'profileName', 'profileList', 'colorCode',
     'materialReadout', 'paperTextureToggle', 'previousPageButton', 'nextPageButton', 'printDocument',
+    'sourcePane', 'previewPane', 'jumpToPreviewButton', 'returnToSourceButton',
+    'metadataPrivacySummary', 'metadataOutputSummary', 'metadataStyleSummary', 'metadataSeedSummary',
   ].map((id) => [id, document.getElementById(id)]),
 );
 
@@ -73,10 +75,8 @@ function syncWritingStyleUI(writingStyle) {
 
 function activateWritingStyle(writingStyle) {
   elements.writingStyle.value = writingStyle;
-  const profile = collectProfile();
-  updateMaterialReadout(profile);
+  applyReadabilityPreset({ announce: false });
   setSystemMessage(`${writingStyle === 'print' ? 'Print' : 'Cursive'} writing active`);
-  requestRender(0);
 }
 
 function collectProfile(overrides = {}) {
@@ -98,9 +98,9 @@ function truncateUtf16Safely(text, limit) {
   return text.slice(0, end);
 }
 
-function applyReadabilityPreset({ announce = true, renderDelay = 0 } = {}) {
+function applyReadabilityPreset({ announce = true, renderDelay = 0, immediate = false } = {}) {
   const level = Number(elements.readability.value);
-  const adjustments = deriveReadabilityAdjustments(level, elements.seed.value);
+  const adjustments = deriveReadabilityAdjustments(level, elements.seed.value, elements.writingStyle.value);
   for (const [id, value] of Object.entries(adjustments)) {
     if (elements[id].type === 'checkbox') elements[id].checked = value;
     else elements[id].value = value;
@@ -109,7 +109,8 @@ function applyReadabilityPreset({ announce = true, renderDelay = 0 } = {}) {
   updateOutput('readability');
   updateMaterialReadout(collectProfile());
   if (announce) setSystemMessage(`${readabilityLabel(level)} readability target applied`);
-  requestRender(renderDelay);
+  if (immediate) render();
+  else requestRender(renderDelay);
 }
 
 function updateMaterialReadout(profile) {
@@ -258,6 +259,15 @@ function currentManifest() {
   );
 }
 
+function focusPane(pane, message) {
+  pane.focus({ preventScroll: true });
+  pane.scrollIntoView({
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    block: 'start',
+  });
+  setSystemMessage(message);
+}
+
 document.querySelectorAll('[role="tab"]').forEach((tab) => {
   tab.addEventListener('click', () => activateTab(tab.dataset.tab));
   tab.addEventListener('keydown', (event) => {
@@ -299,6 +309,9 @@ elements.nextPageButton.addEventListener('click', () => {
   setSystemMessage(`Previewing page ${currentPageIndex + 1}`);
 });
 
+elements.jumpToPreviewButton.addEventListener('click', () => focusPane(elements.previewPane, 'Preview in view'));
+elements.returnToSourceButton.addEventListener('click', () => focusPane(elements.sourcePane, 'Source editor in view'));
+
 elements.instrumentControl.addEventListener('click', (event) => {
   const button = event.target.closest('.segment');
   if (!button) return;
@@ -339,10 +352,11 @@ for (const id of PARAMETER_IDS) {
       setSystemMessage(`Readability profile updated for seed ${elements.seed.value}`);
       return;
     }
-    if (id === 'writingStyle') updateMaterialReadout(collectProfile());
-    setSystemMessage(id === 'writingStyle'
-      ? `${elements.writingStyle.value === 'print' ? 'Print' : 'Cursive'} writing active`
-      : 'Parameters synchronized');
+    if (id === 'writingStyle') {
+      activateWritingStyle(elements.writingStyle.value);
+      return;
+    }
+    setSystemMessage('Parameters synchronized');
     requestRender();
   });
 }
@@ -449,7 +463,13 @@ elements.pdfButton.addEventListener('click', async () => {
 });
 
 elements.metadataButton.addEventListener('click', () => {
-  elements.metadataPreview.textContent = JSON.stringify(currentManifest(), null, 2);
+  const manifest = currentManifest();
+  const profile = manifest.generator.profile;
+  elements.metadataPrivacySummary.textContent = manifest.source.retainedByApp ? 'Source text retained' : 'Source text excluded';
+  elements.metadataOutputSummary.textContent = `${manifest.output.pageCount.toLocaleString()} ${manifest.output.pageCount === 1 ? 'page' : 'pages'} · ${manifest.output.glyphCount.toLocaleString()} glyphs`;
+  elements.metadataStyleSummary.textContent = `${profile.writingStyle === 'print' ? 'Print' : 'Cursive'} · ${profile.instrument}`;
+  elements.metadataSeedSummary.textContent = String(manifest.generator.seed);
+  elements.metadataPreview.textContent = JSON.stringify(manifest, null, 2);
   elements.metadataDialog.showModal();
 });
 
@@ -472,4 +492,4 @@ elements.profileForm.addEventListener('submit', (event) => {
 
 renderProfileList();
 PARAMETER_IDS.forEach(updateOutput);
-render();
+applyReadabilityPreset({ announce: false, immediate: true });

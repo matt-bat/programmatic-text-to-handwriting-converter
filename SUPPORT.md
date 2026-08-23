@@ -10,4 +10,4 @@ Sensitive vulnerabilities should be reported privately by following [SECURITY.md
 
 ## Support development
 
-If Scribble Lab is useful to you, you can optionally [support Matthew Bateman on Ko-fi](https://ko-fi.com/matt0bat). Financial support does not purchase support priority, project control, warranties, or special access.
+If Scribble Lab is useful to you, you can optionally [support Matthew Bateman on Ko-fi](https://ko-fi.com/matt0bat). Financial support does not purchase support priority, project control, warranties, special access, paywalled features, or commercial-use rights.

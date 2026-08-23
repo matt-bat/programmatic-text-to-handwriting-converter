@@ -4,6 +4,8 @@
 
 Scribble Lab is a static, single-page application. `app.js` maps controls into a normalized profile, coordinates paginated Canvas previews, and handles local file import, profiles, and exports. The document importer, renderer, stroke-font adapter, bundled coordinate data, and profile store remain separate ES modules so deterministic behavior can be tested without a browser.
 
+Generation is entirely programmatic. The runtime contains no artificial-intelligence model, machine-learning library, training pipeline, inference call, prompt service, or handwriting dataset. JavaScript combines bundled vector coordinates with seeded mathematical transformations and Canvas 2D drawing commands.
+
 ## Synthetic handwriting model
 
 The engine starts from bundled public-domain Hershey Simplex Script, Complex Script, or Simplex Sans vectors and changes their stroke shapes, placement, and material appearance procedurally. The script faces provide cursive writing. The sans face provides non-cursive print writing.
@@ -19,9 +21,11 @@ The engine starts from bundled public-domain Hershey Simplex Script, Complex Scr
 9. Instrument models apply different layer counts, spread, blur, grain, and opacity. Reservoir level adds deterministic thinning and segment dropout.
 10. The paper model draws stock color, low-opacity fibers, and optional notebook rules.
 
-The source editor and local `.txt`/`.md` import path accept up to 50,000 grapheme characters. A separate 200,000 UTF-16 code-unit ceiling rejects or truncates pathological combining sequences before they can consume excessive memory. Common Markdown syntax is converted into readable plain-text conventions before rendering: headings lose hash markers, bullet and numbered lists retain visible prefixes, links retain their labels and targets, quotes keep a quote prefix, and fenced code keeps its content.
+The source editor and local `.txt`/`.md` import path accept up to 50,000 grapheme characters. A separate 200,000 UTF-16 code-unit ceiling rejects or truncates pathological combining sequences before they can consume excessive memory. Common Markdown syntax is converted into readable plain-text conventions before rendering. Primary headings receive handwritten underlines, bullet and numbered lists retain visible prefixes, links retain their labels and targets, quotations receive paired quotation marks, and fenced code keeps its content.
 
-The document model lays out the full source once, then divides it into fixed 1,100 × 1,424-pixel Letter-proportioned pages. Only the selected page is painted into the live preview, which keeps long documents responsive and bounded. Previous and next controls move through the page model. Fitted and 100 percent modes change only the presentation size.
+The Expected Readability control retains its 0 to 100 range and its established mapping through 90 percent. The final ten percent adds a smooth clarity finish that increases size, line height, spacing, stroke stability, and ink continuity while reducing slant, wrist offset, pressure variation, and cursive connections. Seeded writer proportions and per-instance letter variation remain active at the maximum.
+
+The document model lays out the full source once, then divides it into fixed 1,100 × 1,424-pixel Letter-proportioned pages. A shared Unicode segmenter and document-local glyph-width cache avoid repeated setup and measurement work when long documents are rebuilt after a style change. Only the selected page is painted into the live preview, which keeps long documents responsive and bounded. Previous and next controls move through the page model. Fitted and 100 percent modes change only the presentation size.
 
 PDF export takes one stable document snapshot, paints every page into an isolated print document, and then opens the browser print dialog. Editing the source while preparation is underway cannot mix document versions. Print CSS maps each Canvas to one Letter page with explicit page breaks. Prepared canvases are released after printing. This retains the existing stroke-generation method while avoiding unreliable single-canvas dimensions for large documents.
 

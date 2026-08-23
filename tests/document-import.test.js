@@ -26,15 +26,23 @@ const ink = true;
 \`\`\``;
 
   assert.equal(formatMarkdownForHandwriting(markdown), `Field Notes
+___________
 
 - first important point
 [x] finished task
 1. numbered item
-" quoted observation
+“quoted observation”
 
 Read the source (https://example.com).
 
     const ink = true;`);
+});
+
+test('headings and quotations retain natural handwritten hierarchy', () => {
+  assert.equal(
+    formatMarkdownForHandwriting('## Materials\n\n> Keep this note visible.\n\n### Detail'),
+    'Materials\n_________\n\n“Keep this note visible.”\n\nDetail',
+  );
 });
 
 test('Markdown tables remain readable and formatting-only rules disappear', () => {

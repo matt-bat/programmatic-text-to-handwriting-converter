@@ -61,9 +61,23 @@ export function formatMarkdownForHandwriting(markdown) {
       continue;
     }
 
+    const heading = sourceLine.match(/^\s{0,3}(#{1,6})\s+(.+)$/);
+    if (heading) {
+      const headingText = stripInlineMarkdown(heading[2]).trim();
+      formatted.push(headingText);
+      if (heading[1].length <= 2 && headingText) {
+        formatted.push('_'.repeat(Math.min(36, Array.from(headingText).length)));
+      }
+      continue;
+    }
+
+    const quotation = sourceLine.match(/^\s*>\s?(.*)$/);
+    if (quotation) {
+      formatted.push(`“${stripInlineMarkdown(quotation[1]).trim()}”`);
+      continue;
+    }
+
     let line = sourceLine;
-    line = line.replace(/^\s{0,3}#{1,6}\s+/, '');
-    line = line.replace(/^\s*>\s?/, '" ');
     line = line.replace(/^(\s*)[-+*]\s+\[([ xX])\]\s+/, (_, indent, checked) => `${indent}[${checked.trim() ? 'x' : ' '}] `);
     line = line.replace(/^(\s*)[-+*]\s+/, '$1- ');
     line = line.replace(/^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$/, '');

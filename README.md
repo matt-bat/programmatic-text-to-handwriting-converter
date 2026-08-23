@@ -5,18 +5,20 @@
 <h1 align="center">Scribble Lab</h1>
 
 <p align="center">
-  Natural synthetic handwriting with tunable human variation, generated entirely in your browser.
+  Natural synthetic handwriting from programmed vector strokes, with no AI and no handwriting training data.
 </p>
 
 <p align="center">
   <a href="https://github.com/matt-bat/scribble-lab/actions/workflows/ci.yml"><img alt="Continuous integration status" src="https://github.com/matt-bat/scribble-lab/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="LICENSE"><img alt="AGPL-3.0-only license" src="https://img.shields.io/badge/license-AGPL--3.0--only-6f5bd3"></a>
+  <a href="LICENSE"><img alt="PolyForm Noncommercial 1.0.0 license" src="https://img.shields.io/badge/license-PolyForm%20NC%201.0.0-6f5bd3"></a>
   <a href="https://ko-fi.com/matt0bat"><img alt="Support on Ko-fi" src="https://img.shields.io/badge/support-Ko--fi-f28c6f"></a>
 </p>
 
 ## Intent and safety
 
 Scribble Lab helps people generate natural-looking handwritten documents in cursive and print styles. Its procedural algorithm is designed to introduce the kinds of controlled variation found between repeated instances of the same character. Writer profiles, readability controls, physical parameters, pen models, grip characteristics, and paper styles make it possible to explore distinct synthetic writing systems without reducing the output to a repeated font.
+
+Scribble Lab does not use artificial intelligence, machine learning, model inference, or trained handwriting data. Ordinary JavaScript selects points from bundled public-domain vector alphabets, lays out each character, and applies deterministic mathematical changes for motion, pressure, spacing, slant, materials, and seeded human variation. The same inputs therefore reproduce the same result without calling an AI service or learning from anyone's writing.
 
 The application is intentionally identity-free. It does not accept handwriting samples, font files, images, signatures, author labels, or other material that could condition the generator on a real person. It does not provide tracing, writer matching, signature generation, or style extraction. Text and Markdown are processed locally in the browser, and saved profiles contain parameters only.
 
@@ -27,10 +29,11 @@ Please use Scribble Lab for synthetic document creation, education, accessibilit
 ## What makes it different
 
 - Cursive and non-cursive print use distinct bundled vector constructions.
+- Character generation is fully programmatic and uses no AI model or training dataset.
 - Every character instance receives seeded geometric deformation.
 - Correlated writer state preserves overall consistency across a sample.
 - Repeated letters vary without losing their recognizable construction.
-- Expected Readability coordinates several physical parameters through one approachable control.
+- Expected Readability coordinates several physical parameters through one approachable 0 to 100 control, with an extra clarity finish in the final ten percent.
 - Detailed controls model speed, pressure, grip tension, wrist angle, slant, spacing, connection, and reservoir level.
 - Ballpoint, fountain pen, pencil, and marker models respond differently along each stroke.
 - Parameter profiles can be saved locally without retaining source text.
@@ -69,7 +72,7 @@ The browser runtime has no framework, API, database, account, analytics service,
 
 1. Type or paste text into the source pane. You can also open a `.txt`, `.md`, or `.markdown` file.
 2. Choose Cursive or Print.
-3. Move Expected Readability for a coordinated result, or tune the detailed motion and material controls.
+3. Move Expected Readability for a coordinated result, or tune the detailed motion and material controls. The established expressive range continues through 90 percent, while 90 to 100 progressively prioritizes larger, steadier, more separated writing.
 4. Select New sample to generate a different seeded writer.
 5. Save useful parameter combinations as local profiles.
 6. Select Export PDF, then choose Save as PDF in the browser print dialog.
@@ -88,6 +91,12 @@ Markdown headings, lists, task markers, links, quotes, tables, emphasis, and fen
 - Character, raw text, file, and saved-profile bounds limit accidental or hostile memory use.
 
 Generated PDF files contain the text you supplied. Store and share those files according to the sensitivity of that text.
+
+## Warranty, responsibility, and liability
+
+Scribble Lab is provided as is, without warranties or guarantees about accuracy, legibility, fitness for a particular purpose, legal suitability, uninterrupted operation, or the acceptability of generated documents. You are responsible for the text you provide, the files you create, compliance with applicable laws and policies, and how generated material is stored, represented, and shared.
+
+To the fullest extent allowed by law, Matthew Bateman and project contributors are not liable for loss, damage, claims, costs, or consequences arising from use, inability to use, misuse, modification, redistribution, or generated output. This is a plain-language summary. The warranty and liability terms in the [license](LICENSE) control, and legal enforceability can vary by jurisdiction.
 
 ## Validate the project
 
@@ -132,6 +141,8 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md), [SAFETY.md](SAFETY.md), and [CODE_OF_CO
 
 Copyright © 2026 Matthew Bateman.
 
-Scribble Lab is free software licensed under [GNU AGPL version 3 only](LICENSE). You may use, study, share, and modify it under that license. Copyright and license notices must remain intact. Modified network services must offer their corresponding source code to users.
+The current Scribble Lab source is available under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may use, study, modify, and share it only for purposes permitted by that license. Commercial use, profit-seeking paid access or hosting, inclusion in a paid product or service, and use for anticipated business revenue or profit are outside the license grant. The standard license also identifies permitted uses for qualifying noncommercial organizations. Redistributed copies must preserve the license and every `Required Notice:` line in [NOTICE.md](NOTICE.md), including credit to Matthew Bateman.
+
+This is a source-available license, not an OSI-approved open-source license. Copies already received under an earlier AGPL release remain governed by that earlier license. The new license applies to this revised version and later versions released under it.
 
 The bundled Hershey coordinate data is public domain and documented separately in [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md). See [NOTICE.md](NOTICE.md) for attribution and project identity details.

@@ -230,7 +230,7 @@
       </section>
 
       <section class="workspace" aria-label="Text and handwriting preview">
-        <article class="pane source-pane">
+        <article class="pane source-pane" id="sourcePane" tabindex="-1">
           <header class="pane-header">
             <div>
               <span class="pane-index">A</span>
@@ -243,6 +243,7 @@
                 Open file
               </button>
               <button type="button" class="text-button" id="clearButton">Clear</button>
+              <button type="button" class="text-button mobile-pane-link" id="jumpToPreviewButton">View preview ↓</button>
             </div>
           </header>
           <div class="source-field">
@@ -259,13 +260,14 @@ Synthetic handwriting helps us test reading systems without collecting anyone's 
 
         <div class="flow-indicator" aria-hidden="true"><span>→</span></div>
 
-        <article class="pane preview-pane">
+        <article class="pane preview-pane" id="previewPane" tabindex="-1">
           <header class="pane-header">
             <div>
               <span class="pane-index pane-index-output">B</span>
               <div><p>Synthetic page</p><small id="previewSubtitle">Pen · seed 43182</small></div>
             </div>
             <div class="preview-tools">
+              <button type="button" class="text-button mobile-pane-link" id="returnToSourceButton">↑ Edit text</button>
               <div class="page-control" aria-label="Preview page">
                 <button type="button" class="page-button" id="previousPageButton" aria-label="Previous page">‹</button>
                 <span id="pagePosition">1 / 1</span>
@@ -308,7 +310,16 @@ Synthetic handwriting helps us test reading systems without collecting anyone's 
           <button class="icon-button" value="close" aria-label="Close dialog">×</button>
         </header>
         <p class="dialog-copy">Export a companion JSON record describing the generator settings. Source text is represented only by its character count.</p>
-        <pre id="metadataPreview" tabindex="0" role="region" aria-label="Synthetic sample metadata JSON"></pre>
+        <dl class="metadata-summary" aria-label="Sample metadata summary">
+          <div><dt>Privacy</dt><dd id="metadataPrivacySummary">Source text excluded</dd></div>
+          <div><dt>Output</dt><dd id="metadataOutputSummary">1 page</dd></div>
+          <div><dt>Writing</dt><dd id="metadataStyleSummary">Cursive · pen</dd></div>
+          <div><dt>Sample seed</dt><dd id="metadataSeedSummary">43182</dd></div>
+        </dl>
+        <details class="metadata-technical">
+          <summary>View technical JSON</summary>
+          <pre id="metadataPreview" tabindex="0" role="region" aria-label="Synthetic sample metadata JSON"></pre>
+        </details>
         <footer>
           <button class="button button-ghost" value="close">Cancel</button>
           <button class="button button-primary" type="button" id="downloadMetadataButton">Download JSON</button>

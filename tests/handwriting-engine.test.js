@@ -127,6 +127,31 @@ test('grapheme segmentation counts combined characters as one visual unit', () =
   assert.equal(segmentGraphemes('A👩🏽‍🔬é').length, 3);
 });
 
+test('grapheme segmentation reuses its Unicode segmenter across document work', async () => {
+  const NativeSegmenter = Intl.Segmenter;
+  let constructions = 0;
+  Intl.Segmenter = class CountingSegmenter {
+    constructor(...args) {
+      constructions += 1;
+      this.segmenter = new NativeSegmenter(...args);
+    }
+
+    segment(value) {
+      return this.segmenter.segment(value);
+    }
+  };
+
+  try {
+    const optimizedEngine = await import('../src/handwriting-engine.js?segmenter-reuse-test');
+    optimizedEngine.segmentGraphemes('first 👩🏽‍🔬 sample');
+    optimizedEngine.segmentGraphemes('second é sample');
+    optimizedEngine.createHandwritingDocument('repeated words '.repeat(200), DEFAULT_PROFILE);
+    assert.equal(constructions, 1);
+  } finally {
+    Intl.Segmenter = NativeSegmenter;
+  }
+});
+
 test('large documents paginate without truncating their full glyph and line model', () => {
   const text = 'human writing '.repeat(3_850).slice(0, 50_000);
   const documentModel = createHandwritingDocument(text, DEFAULT_PROFILE);

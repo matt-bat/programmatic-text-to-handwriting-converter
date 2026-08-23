@@ -47,6 +47,7 @@ const ACCENT_PATHS = Object.freeze({
 
 const parsedCache = new Map();
 const MAX_GRAPHEME_CODE_POINTS = 64;
+const HIGH_EXIT_CHARACTERS = new Set(['o', 'w', 'v', 'b', 'O', 'W', 'V', 'B', 'ô', 'ö', 'ò', 'ó']);
 
 function parsePathData(pathData) {
   const tokens = pathData.match(/[ML]|-?\d+(?:\.\d+)?/g) || [];
@@ -103,13 +104,12 @@ export function getStrokeGlyph(grapheme, construction = 'simplex', writingStyle 
   const dString = Array.isArray(raw.d) ? raw.d[activeIndex] : raw.d;
   const cacheKey = `${family}:${variant}:${base}:${activeIndex}`;
   if (!parsedCache.has(cacheKey)) parsedCache.set(cacheKey, parsePathData(dString));
-  const highExitChars = new Set(['o', 'w', 'v', 'b', 'O', 'W', 'V', 'B', 'ô', 'ö', 'ò', 'ó']);
   return {
     base,
     advance: Number(raw.o) * 1.68,
     paths: parsedCache.get(cacheKey),
     marks: marks.flatMap((mark) => ACCENT_PATHS[mark]),
-    exitType: highExitChars.has(base) ? 'high' : 'low',
+    exitType: HIGH_EXIT_CHARACTERS.has(base) ? 'high' : 'low',
     variantCount,
     variantIndex: activeIndex,
   };
