@@ -2,23 +2,72 @@
   <img src="src/assets/scribble-lab-mark.svg" width="88" alt="Scribble Lab mark">
 </p>
 
-<h1 align="center">Scribble Lab</h1>
+<h1 align="center">Programmatic Text-to-Handwriting Converter</h1>
 
 <p align="center">
-  Natural synthetic handwriting from programmed vector strokes, with no AI and no handwriting training data.
+  The Scribble Lab browser app converts text into naturally varied handwriting with programmed vector strokes—no AI model, machine learning, or handwriting training data.
 </p>
 
 <p align="center">
-  <a href="https://github.com/matt-bat/scribble-lab/actions/workflows/ci.yml"><img alt="Continuous integration status" src="https://github.com/matt-bat/scribble-lab/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/matt-bat/programmatic-text-to-handwriting-converter/actions/workflows/ci.yml"><img alt="Continuous integration status" src="https://github.com/matt-bat/programmatic-text-to-handwriting-converter/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="PolyForm Noncommercial 1.0.0 license" src="https://img.shields.io/badge/license-PolyForm%20NC%201.0.0-6f5bd3"></a>
   <a href="https://ko-fi.com/matt0bat"><img alt="Support on Ko-fi" src="https://img.shields.io/badge/support-Ko--fi-f28c6f"></a>
 </p>
 
+## What this project is
+
+Scribble Lab is a local-first, programmatic text-to-handwriting converter for cursive and print documents. It does not paste a handwriting font repeatedly and it does not ask an AI to draw the page. Instead, its JavaScript renderer starts with public-domain vector letterforms and applies reproducible geometry, motion, pressure, pen, ink, spacing, and paper rules to every character.
+
+Here, *synthetic handwriting* simply means handwriting-like output rendered by software. It does not mean AI-generated handwriting.
+
+> **No AI is used to generate the handwriting.** The runtime contains no model weights, machine-learning library, training pipeline, inference step, prompt service, or generative-AI API. It never learns from handwriting samples. All generation happens locally through deterministic JavaScript math and Canvas 2D drawing commands.
+
+Because the generator is seeded, the same text, seed, and settings reproduce the same document. Selecting **New sample** changes the seed and produces a different—but still deterministic—writer and page.
+
+## Developer quick start
+
+Prerequisites: Node.js 20+, npm, Python 3.10+, and a current browser.
+
+```bash
+git clone https://github.com/matt-bat/programmatic-text-to-handwriting-converter.git
+cd programmatic-text-to-handwriting-converter
+npm ci
+npm start
+```
+
+Open `http://127.0.0.1:4173`. The Python process is only a static-file server; the application itself is framework-free browser JavaScript with no build step, backend, API, database, account system, analytics, remote fonts, or environment variables.
+
+Run deterministic unit and syntax checks with `npm run check`. The full Playwright workflow suite is available through `npm run test:browser` after installing its browser binaries.
+
+## How it works, step by step
+
+1. **Read and normalize the input.** The app accepts typed text or a local text/Markdown file. Markdown is converted into handwriting-friendly headings, lists, links, quotations, tables, and code conventions. Text stays in the browser.
+2. **Split text into human-readable characters.** A grapheme-aware segmenter keeps accented characters and combined Unicode symbols together, then a word-preserving layout engine wraps lines and paginates the document.
+3. **Choose a vector glyph.** Each printable character is mapped to bundled public-domain Hershey stroke coordinates. Cursive and print use different vector constructions; the program does not call a system handwriting font.
+4. **Create a seeded writer profile.** A small pseudo-random number generator derives consistent width, height, shear, rotation, motion, shape, and pressure tendencies from the selected seed and writing style.
+5. **Vary each character instance.** A seed derived from the document seed, character, and position bends and shifts the glyph's stroke points. Two instances of the same letter keep the same underlying construction but do not have identical geometry.
+6. **Carry motion forward.** Position, baseline drift, rotation, width, height, and pressure phase are blended from one glyph to the next. This correlated state makes nearby letters feel as though they came from one moving hand instead of receiving unrelated random jitter.
+7. **Apply the physical controls.** Speed, shakiness, grip, wrist support, wrist angle, slant, spacing, and pressure become bounded coefficients for drift, shear, rotation, deformation, and stroke width. The Expected Readability control coordinates these values for users who do not want to tune them individually.
+8. **Add cursive connections.** In cursive mode, eligible neighboring letters can receive seeded curved connectors. Their frequency responds to the connection and speed controls. Print mode suppresses them.
+9. **Simulate the writing material.** Every path is traversed segment by segment. Ballpoint, fountain pen, pencil, and marker settings change width, layers, spread, opacity, grain, nib direction, and ink continuity. Reservoir level can introduce deterministic thinning or skipped segments.
+10. **Draw the paper and pages.** Canvas 2D paints the selected stock, subtle fibers, optional notebook rules, and the transformed strokes onto fixed Letter-proportioned pages.
+11. **Preview or export.** The app renders only the selected preview page for responsiveness. PDF export takes one stable document snapshot, renders every page locally, and opens the browser print dialog.
+
+There is no probabilistic model hidden inside these steps. The apparent naturalness comes from several small, bounded variations working together at different scales.
+
+## Where the natural variance comes from
+
+Natural-looking variation needs both difference and continuity. Pure randomness would make letters jump around; exact repetition would look like a font. The renderer balances the two:
+
+- **Document-level consistency:** the seed creates one overall writer profile for proportions, slant, rotation, motion, and pressure.
+- **Character-level difference:** each glyph instance receives its own repeatable warp, scale, bend, offset, and micro-motion.
+- **Neighbor-to-neighbor continuity:** smoothed state carries baseline drift, rotation, size, and pressure phase forward, so changes develop gradually.
+- **Tool-specific marks:** pen angle, pressure, reservoir, graphite grain, marker layering, and paper surface alter individual path segments.
+- **Seeded reproducibility:** every variation comes from deterministic pseudo-random values. A seed creates variety without making results irreproducible.
+
+This is an approximation of handwriting dynamics, not a biometric model. It is designed to create generic, identity-free writing and cannot learn, copy, match, or authenticate a real person's handwriting.
+
 ## Intent and safety
-
-Scribble Lab helps people generate natural-looking handwritten documents in cursive and print styles. Its procedural algorithm is designed to introduce the kinds of controlled variation found between repeated instances of the same character. Writer profiles, readability controls, physical parameters, pen models, grip characteristics, and paper styles make it possible to explore distinct synthetic writing systems without reducing the output to a repeated font.
-
-Scribble Lab does not use artificial intelligence, machine learning, model inference, or trained handwriting data. Ordinary JavaScript selects points from bundled public-domain vector alphabets, lays out each character, and applies deterministic mathematical changes for motion, pressure, spacing, slant, materials, and seeded human variation. The same inputs therefore reproduce the same result without calling an AI service or learning from anyone's writing.
 
 The application is intentionally identity-free. It does not accept handwriting samples, font files, images, signatures, author labels, or other material that could condition the generator on a real person. It does not provide tracing, writer matching, signature generation, or style extraction. Text and Markdown are processed locally in the browser, and saved profiles contain parameters only.
 
@@ -52,21 +101,6 @@ Please use Scribble Lab for synthetic document creation, education, accessibilit
 <p align="center">
   <img src="docs/screenshots/scribble-lab-mobile.png" width="390" alt="Scribble Lab mobile layout">
 </p>
-
-## Run locally
-
-You need Node.js 20 or newer, npm, Python 3.10 or newer, and a current browser.
-
-```bash
-git clone https://github.com/matt-bat/scribble-lab.git
-cd scribble-lab
-npm install
-npm start
-```
-
-Open `http://127.0.0.1:4173`.
-
-The browser runtime has no framework, API, database, account, analytics service, external font request, or required environment variable.
 
 ## Create handwriting
 
@@ -136,6 +170,8 @@ docs/operations.md           Local operation and verification details
 Bug reports, accessibility improvements, tests, documentation, and identity-free rendering improvements are welcome. Features that ingest or imitate a real person’s handwriting or signature are outside the project scope and will not be accepted.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md), [SAFETY.md](SAFETY.md), and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before opening a pull request. Report sensitive security concerns through the private reporting instructions in [SECURITY.md](SECURITY.md).
+
+For usage questions, examples, rendering experiments, and feature design, join [GitHub Discussions](https://github.com/matt-bat/programmatic-text-to-handwriting-converter/discussions). Use Issues for reproducible bugs and scoped implementation requests.
 
 ## License and credit
 

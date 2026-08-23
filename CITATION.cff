@@ -1,7 +1,7 @@
 cff-version: 1.2.0
-message: "If you use Scribble Lab in research or teaching, please cite it using this metadata."
-title: "Scribble Lab"
-abstract: "A local-first procedural generator for identity-free synthetic handwriting with cursive and print styles, tunable writer profiles, and natural character variation."
+message: "If you use the Programmatic Text-to-Handwriting Converter (Scribble Lab) in research or teaching, please cite it using this metadata."
+title: "Programmatic Text-to-Handwriting Converter (Scribble Lab)"
+abstract: "A local-first, no-AI procedural generator for identity-free handwriting with cursive and print styles, tunable writer profiles, and seeded natural character variation."
 type: software
 authors:
   - family-names: "Bateman"
@@ -9,11 +9,13 @@ authors:
 version: 1.0.0
 date-released: 2026-08-22
 license: PolyForm-Noncommercial-1.0.0
-repository-code: "https://github.com/matt-bat/scribble-lab"
-url: "https://github.com/matt-bat/scribble-lab"
+repository-code: "https://github.com/matt-bat/programmatic-text-to-handwriting-converter"
+url: "https://github.com/matt-bat/programmatic-text-to-handwriting-converter"
 keywords:
   - synthetic handwriting
   - procedural generation
+  - text to handwriting
+  - no AI
   - optical character recognition
   - local-first software
   - accessibility

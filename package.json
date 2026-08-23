@@ -1,22 +1,24 @@
 {
-  "name": "scribble-lab",
+  "name": "programmatic-text-to-handwriting-converter",
   "version": "1.0.0",
-  "description": "Local-first synthetic handwriting generator with cursive and print styles, natural character variation, tunable profiles, Markdown import, and PDF export.",
+  "description": "Local-first, no-AI text-to-handwriting converter using seeded vector strokes and procedural natural variation, with Markdown input and PDF export.",
   "private": true,
   "type": "module",
   "author": "Matthew Bateman",
   "license": "PolyForm-Noncommercial-1.0.0",
-  "homepage": "https://github.com/matt-bat/scribble-lab#readme",
+  "homepage": "https://github.com/matt-bat/programmatic-text-to-handwriting-converter#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/matt-bat/scribble-lab.git"
+    "url": "git+https://github.com/matt-bat/programmatic-text-to-handwriting-converter.git"
   },
   "bugs": {
-    "url": "https://github.com/matt-bat/scribble-lab/issues"
+    "url": "https://github.com/matt-bat/programmatic-text-to-handwriting-converter/issues"
   },
   "funding": "https://ko-fi.com/matt0bat",
   "keywords": [
     "synthetic-handwriting",
+    "text-to-handwriting",
+    "no-ai",
     "handwriting-generator",
     "procedural-generation",
     "local-first",
