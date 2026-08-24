@@ -15,6 +15,8 @@
   <a href="https://ko-fi.com/matt0bat"><img alt="Support on Ko-fi" src="https://img.shields.io/badge/support-Ko--fi-f28c6f"></a>
 </p>
 
+> Like this project? You can [support ongoing development on Ko-fi](https://ko-fi.com/matt0bat), helping me maintain existing tools and release more public projects.
+
 ## What this project is
 
 Scribble Lab is a local-first, programmatic text-to-handwriting converter for cursive and print documents. It does not paste a handwriting font repeatedly and it does not ask an AI to draw the page. Instead, its JavaScript renderer starts with public-domain vector letterforms and applies reproducible geometry, motion, pressure, pen, ink, spacing, and paper rules to every character.
