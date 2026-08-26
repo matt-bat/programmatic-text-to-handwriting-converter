@@ -39,7 +39,7 @@
     "check": "node --check src/app.js && node --check src/handwriting-engine.js && node --check src/profile-store.js && node --test tests/*.test.js"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.12.1",
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.62.1"
   }
 }
