@@ -44,6 +44,7 @@ npx playwright install chromium firefox webkit
 - Add the smallest reliable test for changed behavior.
 - Preserve deterministic seeded output unless a documented engine version change requires otherwise.
 - Preserve keyboard access, responsive layout, and readable control labels.
+- Exercise affected paper, damage, scan, page-format, writing-style, and readability combinations; compare screenshots with the prior generation when renderer output changes.
 - Keep runtime generation local and self-contained.
 - Update canonical documentation when behavior changes.
 - Do not commit generated PDFs, local profiles, credentials, or test artifacts.

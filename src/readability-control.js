@@ -1,7 +1,6 @@
 import { createRng } from './handwriting-engine.js';
 
 export const READABILITY_CONTROLLED_IDS = Object.freeze([
-  'size',
   'lineHeight',
   'spacing',
   'speed',
@@ -45,9 +44,10 @@ export function deriveReadabilityAdjustments(value, seed, writingStyle = 'print'
   const bias = (amount) => (rng() * 2 - 1) * amount;
   const slantDirection = rng() < 0.18 ? -1 : 1;
   const wristDirection = rng() < 0.5 ? -1 : 1;
+  // Keep the seeded draw sequence stable after letter size became independently controlled.
+  bias(1.2);
 
   const adjustments = {
-    size: Math.round(clamp(mix(29, 40, clarity) + bias(1.2), 22, 52)),
     lineHeight: Number(clamp(mix(1.38, 1.84, clarity) + bias(0.035), 1.25, 2.1).toFixed(2)),
     spacing: Math.round(clamp(mix(-1, 7, clarity) + bias(0.8), -2, 14)),
     speed: Math.round(clamp(mix(96, 72, clarity) + bias(3), 0, 100)),
@@ -67,7 +67,6 @@ export function deriveReadabilityAdjustments(value, seed, writingStyle = 'print'
   if (maximumClarity === 0) return adjustments;
 
   return {
-    size: Math.round(mix(adjustments.size, 42, maximumClarity)),
     lineHeight: Number(mix(adjustments.lineHeight, 1.96, maximumClarity).toFixed(2)),
     spacing: Math.round(mix(adjustments.spacing, 10, maximumClarity)),
     speed: Math.round(mix(adjustments.speed, 88, maximumClarity)),

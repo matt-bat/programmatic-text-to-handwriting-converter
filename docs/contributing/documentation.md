@@ -27,4 +27,4 @@ Update links when the repository name or file layout changes. Use repository-rel
 
 Use the real application and generic sample text. Keep source text free of personal information. Capture enough of the interface to show the relevant behavior, and include useful alt text wherever the asset is embedded.
 
-Run a link and spelling review before submitting. If a technical claim changed, confirm it against the implementation and tests.
+Run a link and spelling review before submitting. If a technical claim changed, confirm it against the implementation and tests. Rendering changes should compare new captures with the prior documented generation and explain intentional visual differences, especially for cursive clarity, paper damage, scan simulation, and pagination.

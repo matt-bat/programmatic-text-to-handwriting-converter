@@ -18,7 +18,7 @@ Keep these project rules in mind:
 ## Choosing the right layer
 
 - Change `stroke-font.js` for glyph lookup, variants, accents, or measurements.
-- Change `handwriting-engine.js` for layout, writer state, deformation, connectors, instruments, paper, or pagination.
+- Change `handwriting-engine.js` for layout, writer state, deformation, connectors, instruments, paper, damage, scan simulation, page geometry, or pagination.
 - Change `readability-control.js` when one readability level should coordinate several existing parameters.
 - Change `app.js` only when the interface or export workflow needs different engine input.
 
@@ -33,6 +33,7 @@ For an engine change, check all of the following:
 5. Long text still paginates without truncation.
 6. Maximum readability keeps some seeded character while improving clarity.
 7. The browser workflow passes in Chromium, Firefox, and WebKit.
+8. Paper, damage, scan, and page-format combinations still match the paged preview and print document.
 
 If a change intentionally alters seeded output, describe why in the pull request and update the engine or profile version when compatibility requires it.
 

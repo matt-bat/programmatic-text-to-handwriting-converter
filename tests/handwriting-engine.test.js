@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   DEFAULT_PROFILE,
+  PAGE_SIZES,
   DOCUMENT_PAGE_HEIGHT,
   DOCUMENT_PAGE_WIDTH,
   createHandwritingDocument,
@@ -16,6 +17,7 @@ import {
   varyStrokePaths,
   varyStrokePathsKinematic,
 } from '../src/handwriting-engine.js';
+import { createBuildProvenance, PROVENANCE_SCHEMA } from '../src/provenance.js';
 
 test('seeded generator is stable and separates different seeds', () => {
   const first = createRng('sample-42');
@@ -76,6 +78,39 @@ test('default profile provides a finite reservoir level', () => {
   assert.ok(Number.isFinite(profile.reservoir));
 });
 
+test('paper damage and scan controls normalize to safe bounded values', () => {
+  const profile = normalizeProfile({
+    pageSize: 'wall-poster',
+    paper: 'colored',
+    paperColor: 'not-a-color',
+    paperWear: 900,
+    lineConsistency: -20,
+    scanQuality: 240,
+    wearSeed: 0,
+    wearFire: 1,
+  });
+
+  assert.equal(profile.pageSize, DEFAULT_PROFILE.pageSize);
+  assert.equal(profile.paper, 'colored');
+  assert.equal(profile.paperColor, DEFAULT_PROFILE.paperColor);
+  assert.equal(profile.paperWear, 100);
+  assert.equal(profile.lineConsistency, 0);
+  assert.equal(profile.scanQuality, 100);
+  assert.equal(profile.wearSeed, 1);
+  assert.equal(profile.wearFire, true);
+});
+
+test('document geometry follows the selected physical page format', () => {
+  for (const [pageSize, dimensions] of Object.entries(PAGE_SIZES)) {
+    const documentModel = createHandwritingDocument('Page format sample', { ...DEFAULT_PROFILE, pageSize });
+    assert.equal(documentModel.width, dimensions.width);
+    assert.equal(documentModel.height, dimensions.height);
+    assert.equal(documentModel.pageSizeLabel, dimensions.label);
+    assert.equal(documentModel.printWidth, dimensions.printWidth);
+    assert.equal(documentModel.printHeight, dimensions.printHeight);
+  }
+});
+
 test('stroke variation is reproducible, changes each instance, and preserves source geometry', () => {
   const paths = [[[0, 0], [5, 8], [10, 0]], [[2, 3], [8, 3]]];
   const source = structuredClone(paths);
@@ -95,6 +130,20 @@ test('wrist support reduces synthetic motion drift and jitter', () => {
   const unsupported = deriveDynamics({ ...DEFAULT_PROFILE, wristSupport: false });
   assert.ok(supported.jitter < unsupported.jitter);
   assert.ok(supported.drift < unsupported.drift);
+});
+
+test('maximum readability regularizes cursive shape and instance variation', () => {
+  const expressive = deriveDynamics({ ...DEFAULT_PROFILE, writingStyle: 'cursive', readability: 35 });
+  const clear = deriveDynamics({ ...DEFAULT_PROFILE, writingStyle: 'cursive', readability: 100 });
+  const expressiveWriter = deriveWriterStyle({ ...DEFAULT_PROFILE, writingStyle: 'cursive', readability: 35 });
+  const clearWriter = deriveWriterStyle({ ...DEFAULT_PROFILE, writingStyle: 'cursive', readability: 100 });
+
+  assert.ok(clear.shapeVariation < expressive.shapeVariation);
+  assert.ok(clear.instanceVariation < expressive.instanceVariation);
+  assert.ok(clear.instanceVariation > 0);
+  assert.ok(Math.abs(clearWriter.widthScale - 1) < Math.abs(expressiveWriter.widthScale - 1));
+  assert.ok(Math.abs(clearWriter.shearOffset) < Math.abs(expressiveWriter.shearOffset));
+  assert.ok(clearWriter.letterVariation > 0);
 });
 
 test('layout wraps, preserves explicit line breaks, and caps no content', () => {
@@ -183,7 +232,34 @@ test('export manifest omits source text and declares identity-free generation', 
   assert.equal(manifest.generator.identityConditioned, false);
   assert.equal(manifest.generator.externalHandwritingSamples, false);
   assert.match(manifest.generator.strokeModel, /public domain/);
+  assert.equal(manifest.provenance.status, 'not-issued');
   assert.equal(serialized.includes('private source phrase'), false);
+});
+
+test('public builds label exported metadata as having no commercial certificate', () => {
+  const provenance = createBuildProvenance({ certificate: null, signature: null, publicKey: null });
+  assert.equal(provenance.schema, PROVENANCE_SCHEMA);
+  assert.equal(provenance.status, 'not-issued');
+  assert.equal(provenance.note.includes('public build'), true);
+});
+
+test('commercial provenance records require a complete signed certificate shape', () => {
+  const certificate = {
+    schema: PROVENANCE_SCHEMA,
+    buildId: 'licensee-build-01',
+    issuedAt: '2026-08-25T00:00:00.000Z',
+    licenseeId: 'example-company',
+    licenseId: 'eval-001',
+    permittedUse: 'internal-ai-evaluation',
+  };
+  const provenance = createBuildProvenance({
+    certificate,
+    signature: 'signature-value',
+    publicKey: { algorithm: 'Ed25519', keyId: 'issuer-key-01', spki: 'public-key-value' },
+  });
+  assert.equal(provenance.status, 'commercial-certificate');
+  assert.deepEqual(provenance.certificate, certificate);
+  assert.equal(createBuildProvenance({ certificate, signature: '', publicKey: null }).status, 'not-issued');
 });
 
 test('kinematic stroke warping generates distinct point paths across letter instances', () => {

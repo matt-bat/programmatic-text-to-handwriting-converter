@@ -32,7 +32,7 @@ The renderer keeps a writer state with horizontal and vertical offset, rotation,
 
 Speed, shakiness, grip, wrist support, wrist angle, slant, pressure, and paper type become coefficients for jitter, drift, tracking noise, shear, rotation, and deformation.
 
-The Expected Readability control coordinates several of these settings. At higher levels it increases size and spacing while reducing motion that hurts clarity. Seeded writer traits remain active, so maximum readability does not collapse into one fixed font.
+The Expected Readability control coordinates several of these settings while leaving letter size under direct user control. At higher levels it increases spacing and stability while reducing motion and cursive deformation that hurt clarity. Seeded writer traits remain active, so maximum readability does not collapse into one fixed font.
 
 ## Draw one segment at a time
 
@@ -40,13 +40,13 @@ Canvas 2D traverses each vector path as line segments. Pressure changes line wid
 
 Cursive mode can add seeded curved connectors between eligible neighbors. Print mode leaves those connectors out.
 
-The paper renderer draws stock color, subtle fibers, and optional notebook rules before the ink is painted.
+The paper renderer draws stock color, subtle fibers, notebook rules, or a grid before the ink is painted. Seeded crumpling, fold, stain, and fire layers can be composed below and above the ink. That foreground phase lets bleaching, deposits, soot, and burn-through obscure parts of a line like damage in a poorly preserved source document. Optional scan simulation then converts the complete page to monochrome and adds quality-dependent loss.
 
 ## Lay out and export the document
 
-The importer turns common Markdown into readable text conventions. Grapheme-aware layout keeps combined characters together, preserves explicit line breaks, wraps words, and divides the result into fixed Letter-proportioned pages.
+The importer turns common Markdown into readable text conventions. Grapheme-aware layout keeps combined characters together, preserves explicit line breaks, wraps words, and divides the result into the selected physical page format.
 
-Only the selected page is painted for the live preview. PDF export takes a stable snapshot, renders every page locally, and opens the browser print dialog.
+The live preview displays the same page stack used for export, with bounded-resolution secondary pages for large sources. PDF export takes a stable snapshot, renders every page locally at full resolution, and opens the browser print dialog.
 
 ## Why this is not AI
 

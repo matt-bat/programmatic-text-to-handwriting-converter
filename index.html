@@ -8,7 +8,7 @@
     <meta name="description" content="Convert text into naturally varied handwriting locally with seeded vector strokes and procedural JavaScript. No AI or handwriting training data." />
     <meta name="author" content="Matthew Bateman" />
     <meta name="application-name" content="Scribble Lab" />
-    <meta name="theme-color" content="#efe6d3" />
+    <meta name="theme-color" content="#11162a" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Programmatic Text-to-Handwriting Converter | Scribble Lab" />
     <meta property="og:description" content="A local-first, no-AI handwriting renderer using seeded vector strokes, procedural natural variation, Markdown input, and PDF export." />
@@ -133,6 +133,10 @@
             <input type="range" id="pressureVariation" min="0" max="100" value="36" />
           </label>
           <label class="control">
+            <span class="control-label">Line consistency <output data-output="lineConsistency">82%</output></span>
+            <input type="range" id="lineConsistency" min="0" max="100" value="82" />
+          </label>
+          <label class="control">
             <span class="control-label">Grip tension <output data-output="grip">44%</output></span>
             <input type="range" id="grip" min="0" max="100" value="44" />
           </label>
@@ -193,10 +197,28 @@
             <span class="control-label">Paper stock</span>
             <select id="paper">
               <option value="notebook">Ruled notebook</option>
+              <option value="grid">Grid paper</option>
+              <option value="printer">Off-white printer paper</option>
+              <option value="colored">Colored paper</option>
               <option value="ivory">Warm ivory</option>
               <option value="bright">Bright uncoated</option>
               <option value="recycled">Rough recycled</option>
             </select>
+          </label>
+          <label class="control">
+            <span class="control-label">Paper size</span>
+            <select id="pageSize">
+              <option value="letter">US Letter · 8.5 × 11</option>
+              <option value="a4">A4 · 210 × 297 mm</option>
+              <option value="legal">US Legal · 8.5 × 14</option>
+              <option value="cardstock">Cardstock · 5 × 7</option>
+              <option value="business">Business card · 3.5 × 2</option>
+              <option value="square">Square · 6 × 6</option>
+            </select>
+          </label>
+          <label class="control color-control">
+            <span class="control-label">Colored paper</span>
+            <span class="color-field"><input type="color" id="paperColor" value="#dce6ef" /><code id="paperColorCode">#DCE6EF</code></span>
           </label>
           <label class="control">
             <span class="control-label">Reservoir level <output data-output="reservoir">88%</output></span>
@@ -205,6 +227,29 @@
           <label class="control color-control">
             <span class="control-label">Ink or lead color</span>
             <span class="color-field"><input type="color" id="inkColor" value="#233d4d" /><code id="colorCode">#233D4D</code></span>
+          </label>
+          <label class="control wear-control">
+            <span class="control-label">Document wear <output data-output="paperWear">Clean · 0%</output></span>
+            <input type="range" id="paperWear" min="0" max="100" value="0" />
+          </label>
+          <fieldset class="damage-options">
+            <legend>Damage included</legend>
+            <label><input type="checkbox" id="wearCrumple" checked /> Crumpling</label>
+            <label><input type="checkbox" id="wearCreases" checked /> Fold creases</label>
+            <label><input type="checkbox" id="wearStains" checked /> Water / coffee stains</label>
+            <label><input type="checkbox" id="wearFire" /> Fire / smoke</label>
+          </fieldset>
+          <label class="toggle-control" for="scanMode">
+            <span>
+              <strong>Scanned document</strong>
+              <small>Convert the page to a monochrome scan</small>
+            </span>
+            <input type="checkbox" id="scanMode" />
+            <span class="toggle" aria-hidden="true"></span>
+          </label>
+          <label class="control">
+            <span class="control-label">Scan quality <output data-output="scanQuality">78%</output></span>
+            <input type="range" id="scanQuality" min="0" max="100" value="78" />
           </label>
           <div class="material-readout" id="materialReadout">
             <span>Current model</span>
@@ -280,9 +325,12 @@ Synthetic handwriting helps us test reading systems without collecting anyone's 
               <span class="live-badge"><i></i> Live</span>
             </div>
           </header>
-          <div class="canvas-stage" id="canvasStage">
-            <div class="page-shadow">
-              <canvas id="outputCanvas" aria-label="Generated synthetic handwriting preview"></canvas>
+          <div class="canvas-stage" id="canvasStage" tabindex="0" aria-label="Paginated document preview. Scroll to inspect pages or use the previous and next page buttons.">
+            <div class="preview-pages" id="previewPages">
+              <div class="page-shadow">
+                <span class="page-label">Page 1</span>
+                <canvas id="outputCanvas" aria-label="Generated synthetic handwriting preview"></canvas>
+              </div>
             </div>
           </div>
           <footer class="pane-footer">

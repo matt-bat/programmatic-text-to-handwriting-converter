@@ -32,6 +32,8 @@ Fraud, impersonation, forged signatures, and deceptive documents may also violat
 
 A permissive license would make commercial reuse and resale much easier. That does not match the maintainer's goals for this project. The current license keeps the source available for permitted noncommercial use while reserving commercial exploitation.
 
+Corporate or commercial users who need broader rights can request a separate, more permissive licence from Matthew Bateman through the project's [GitHub Discussions](https://github.com/matt-bat/programmatic-text-to-handwriting-converter/discussions). Any such rights require a separate agreement; this contact option does not expand the public licence.
+
 This license choice can reduce adoption by companies and by directories that only list OSI-approved open-source projects. That tradeoff is understood and accepted. Protecting the project's noncommercial purpose and maintaining its safety boundary are more important than maximizing reuse at any cost.
 
 For the actual terms, read [LICENSE](../LICENSE) and [NOTICE.md](../NOTICE.md).

@@ -23,11 +23,14 @@ import {
   deriveReadabilityAdjustments,
   readabilityLabel,
 } from './readability-control.js';
+import { COMMERCIAL_PROVENANCE } from './commercial-provenance.js';
+import { createBuildProvenance } from './provenance.js';
 
 const PARAMETER_IDS = [
   'readability', 'seed', 'size', 'lineHeight', 'spacing', 'speed', 'shakiness', 'pressure',
-  'pressureVariation', 'grip', 'wristAngle', 'slant', 'connection', 'reservoir', 'wristSupport',
-  'penKind', 'writingStyle', 'construction', 'paper', 'inkColor', 'paperTexture',
+  'pressureVariation', 'lineConsistency', 'grip', 'wristAngle', 'slant', 'connection', 'reservoir', 'wristSupport',
+  'penKind', 'writingStyle', 'construction', 'paper', 'pageSize', 'paperColor', 'inkColor', 'paperTexture',
+  'paperWear', 'wearCrumple', 'wearCreases', 'wearStains', 'wearFire', 'scanMode', 'scanQuality',
 ];
 
 const elements = Object.fromEntries(
@@ -36,9 +39,9 @@ const elements = Object.fromEntries(
     'sourceText', 'sourceFile', 'outputCanvas', 'characterCount', 'lineCount', 'pageCount', 'pagePosition', 'renderTime',
     'previewSubtitle', 'engineStatus', 'systemMessage', 'instrumentControl', 'styleControl', 'newSeedButton',
     'clearButton', 'importButton', 'pdfButton', 'metadataButton', 'metadataDialog', 'metadataPreview',
-    'downloadMetadataButton', 'profileForm', 'profileName', 'profileList', 'colorCode',
+    'downloadMetadataButton', 'profileForm', 'profileName', 'profileList', 'colorCode', 'paperColorCode',
     'materialReadout', 'paperTextureToggle', 'previousPageButton', 'nextPageButton', 'printDocument',
-    'sourcePane', 'previewPane', 'jumpToPreviewButton', 'returnToSourceButton',
+    'sourcePane', 'previewPane', 'previewPages', 'canvasStage', 'jumpToPreviewButton', 'returnToSourceButton',
     'metadataPrivacySummary', 'metadataOutputSummary', 'metadataStyleSummary', 'metadataSeedSummary',
   ].map((id) => [id, document.getElementById(id)]),
 );
@@ -50,9 +53,18 @@ let lastResult = null;
 let currentDocument = null;
 let currentPageIndex = 0;
 let renderTimer = null;
+let paperWearSeed = randomUint32();
+let previewObserver = null;
+
+function randomUint32() {
+  const values = new Uint32Array(1);
+  crypto.getRandomValues(values);
+  return values[0] || 1;
+}
 
 function formatOutput(id, value) {
   if (id === 'readability') return `${readabilityLabel(value)} · ${value}%`;
+  if (id === 'paperWear') return `${Number(value) === 0 ? 'Clean' : Number(value) < 35 ? 'Handled' : Number(value) < 70 ? 'Aged' : 'Damaged'} · ${value}%`;
   if (id === 'size' || id === 'spacing') return `${value} px`;
   if (id === 'lineHeight') return `${Number(value).toFixed(2)}×`;
   if (['wristAngle', 'slant'].includes(id)) return `${Number(value) < 0 ? '−' : ''}${Math.abs(Number(value))}°`;
@@ -83,6 +95,7 @@ function collectProfile(overrides = {}) {
   return normalizeProfile({
     ...Object.fromEntries(PARAMETER_IDS.map((id) => [id, elements[id].type === 'checkbox' ? elements[id].checked : elements[id].value])),
     instrument,
+    wearSeed: paperWearSeed,
     ...overrides,
   });
 }
@@ -118,16 +131,20 @@ function updateMaterialReadout(profile) {
     ? (profile.penKind === 'fountain' ? 'Fountain nib' : 'Ballpoint')
     : profile.instrument[0].toUpperCase() + profile.instrument.slice(1);
   const paperLabel = {
-    notebook: 'ruled paper', ivory: 'warm ivory', bright: 'bright stock', recycled: 'rough recycled',
+    notebook: 'ruled paper', grid: 'grid paper', printer: 'off-white paper', colored: 'colored stock',
+    ivory: 'warm ivory', bright: 'bright stock', recycled: 'rough recycled',
   }[profile.paper];
   const writingLabel = profile.writingStyle === 'print' ? 'simplex print' : `${profile.construction} cursive`;
   elements.materialReadout.querySelector('strong').textContent = `${instrumentLabel} · ${writingLabel} · ${paperLabel}`;
   elements.penKind.disabled = profile.instrument !== 'pen';
   elements.construction.disabled = profile.writingStyle === 'print';
   elements.connection.disabled = profile.writingStyle === 'print';
+  elements.paperColor.disabled = profile.paper !== 'colored';
+  elements.scanQuality.disabled = !profile.scanMode;
   elements.construction.title = profile.writingStyle === 'print' ? 'Cursive detail applies only to cursive writing' : '';
   elements.connection.title = profile.writingStyle === 'print' ? 'Printed letters are not joined' : '';
   elements.colorCode.textContent = profile.inkColor.toUpperCase();
+  elements.paperColorCode.textContent = profile.paperColor.toUpperCase();
   syncWritingStyleUI(profile.writingStyle);
 }
 
@@ -142,14 +159,62 @@ function updatePageNavigation() {
 
 function renderCurrentPage() {
   if (!currentDocument) return;
+  const selected = elements.previewPages.querySelector(`[data-preview-page="${currentPageIndex}"]`);
+  if (selected && !selected.querySelector('canvas')) {
+    renderPreviewPage(selected, currentPageIndex, currentDocument, previewScaleFor(currentDocument));
+    previewObserver?.unobserve(selected);
+  }
+  elements.previewPages.querySelectorAll('.page-shadow').forEach((page) => page.classList.toggle('is-selected', page === selected));
+  selected?.scrollIntoView({ block: 'nearest', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  updatePageNavigation();
+}
+
+function previewScaleFor(documentModel) {
+  return documentModel.pageCount > 12 ? 0.32 : documentModel.pageCount > 5 ? 0.42 : 0.55;
+}
+
+function renderPreviewPage(page, pageIndex, documentModel, scale) {
+  if (page.querySelector('canvas')) return;
+  const canvas = document.createElement('canvas');
+  if (pageIndex === 0) canvas.id = 'outputCanvas';
+  canvas.setAttribute('aria-label', `Generated synthetic handwriting preview, page ${pageIndex + 1} of ${documentModel.pageCount}`);
+  documentModel.renderPage(canvas, pageIndex, { scale });
+  page.append(canvas);
+}
+
+function renderPreviewPages() {
   const startedAt = performance.now();
-  currentDocument.renderPage(elements.outputCanvas, currentPageIndex);
-  const elapsed = Math.max(1, Math.round(performance.now() - startedAt));
-  elements.renderTime.textContent = `Render ${elapsed} ms`;
-  elements.outputCanvas.setAttribute(
-    'aria-label',
-    `Generated synthetic handwriting preview, page ${currentPageIndex + 1} of ${currentDocument.pageCount}`,
-  );
+  const fragment = document.createDocumentFragment();
+  const previewDocument = currentDocument;
+  const secondaryScale = previewScaleFor(previewDocument);
+  previewObserver?.disconnect();
+  for (let pageIndex = 0; pageIndex < previewDocument.pageCount; pageIndex += 1) {
+    const page = document.createElement('section');
+    page.className = `page-shadow${pageIndex === currentPageIndex ? ' is-selected' : ''}`;
+    page.dataset.previewPage = String(pageIndex);
+    page.style.setProperty('--page-pixel-width', `${previewDocument.width}px`);
+    page.style.aspectRatio = `${previewDocument.width} / ${previewDocument.height}`;
+    const label = document.createElement('span');
+    label.className = 'page-label';
+    label.textContent = `Page ${pageIndex + 1}`;
+    page.append(label);
+    if (pageIndex === 0 || pageIndex === currentPageIndex) {
+      renderPreviewPage(page, pageIndex, previewDocument, pageIndex === 0 ? 1 : secondaryScale);
+    }
+    fragment.append(page);
+  }
+  elements.previewPages.replaceChildren(fragment);
+  elements.outputCanvas = document.getElementById('outputCanvas');
+  previewObserver = new IntersectionObserver((entries, observer) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      const page = entry.target;
+      renderPreviewPage(page, Number(page.dataset.previewPage), previewDocument, secondaryScale);
+      observer.unobserve(page);
+    }
+  }, { root: elements.canvasStage, rootMargin: '600px 0px' });
+  elements.previewPages.querySelectorAll('.page-shadow:not(:has(canvas))').forEach((page) => previewObserver.observe(page));
+  elements.renderTime.textContent = `Render ${Math.max(1, Math.round(performance.now() - startedAt))} ms`;
   updatePageNavigation();
 }
 
@@ -160,7 +225,7 @@ function render() {
   currentDocument = createHandwritingDocument(text, profile);
   lastResult = currentDocument;
   currentPageIndex = Math.min(currentPageIndex, currentDocument.pageCount - 1);
-  renderCurrentPage();
+  renderPreviewPages();
   elements.characterCount.textContent = segmentGraphemes(text).length.toLocaleString();
   elements.lineCount.textContent = currentDocument.lineCount.toLocaleString();
   elements.previewSubtitle.textContent = `${profile.instrument[0].toUpperCase() + profile.instrument.slice(1)} · ${profile.writingStyle} · seed ${profile.seed}`;
@@ -176,6 +241,7 @@ function requestRender(delay = 45) {
 function applyProfile(profile) {
   const normalized = normalizeProfile(profile);
   instrument = normalized.instrument;
+  paperWearSeed = randomUint32();
   for (const id of PARAMETER_IDS) {
     const element = elements[id];
     if (element.type === 'checkbox') element.checked = normalized[id];
@@ -252,10 +318,20 @@ function downloadBlob(blob, filename) {
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function setPrintPageSize(documentModel) {
+  const pageSize = `${documentModel.printWidth} ${documentModel.printHeight}`;
+  for (const stylesheet of document.styleSheets) {
+    for (const rule of stylesheet.cssRules) {
+      if (rule.constructor?.name === 'CSSPageRule') rule.style.setProperty('size', pageSize);
+    }
+  }
+}
+
 function currentManifest() {
   return createExportManifest(
     elements.sourceText.value,
     lastResult || createHandwritingDocument(elements.sourceText.value, collectProfile()),
+    createBuildProvenance(COMMERCIAL_PROVENANCE),
   );
 }
 
@@ -285,7 +361,7 @@ document.querySelectorAll('[role="tab"]').forEach((tab) => {
 document.querySelectorAll('.zoom-button').forEach((button) => {
   button.addEventListener('click', () => {
     const actualSize = button.dataset.zoom === 'actual';
-    document.querySelector('.page-shadow').classList.toggle('is-actual-size', actualSize);
+    elements.previewPages.classList.toggle('is-actual-size', actualSize);
     document.querySelectorAll('.zoom-button').forEach((candidate) => {
       const active = candidate === button;
       candidate.classList.toggle('is-active', active);
@@ -356,6 +432,9 @@ for (const id of PARAMETER_IDS) {
       activateWritingStyle(elements.writingStyle.value);
       return;
     }
+    if (id === 'paperWear') paperWearSeed = randomUint32();
+    if (id === 'paperColor') elements.paperColorCode.textContent = elements.paperColor.value.toUpperCase();
+    if (id === 'paper' || id === 'scanMode') updateMaterialReadout(collectProfile());
     setSystemMessage('Parameters synchronized');
     requestRender();
   });
@@ -431,6 +510,7 @@ elements.newSeedButton.addEventListener('click', () => {
   const values = new Uint32Array(1);
   crypto.getRandomValues(values);
   elements.seed.value = 1 + (values[0] % 999999);
+  paperWearSeed = randomUint32();
   updateOutput('seed');
   setSystemMessage(`New sample ${elements.seed.value}`);
   applyReadabilityPreset({ announce: false });
@@ -443,6 +523,9 @@ elements.pdfButton.addEventListener('click', async () => {
   elements.engineStatus.textContent = 'Preparing PDF';
   setSystemMessage(`Preparing ${exportDocument.pageCount.toLocaleString()} PDF ${exportDocument.pageCount === 1 ? 'page' : 'pages'}`);
   elements.printDocument.replaceChildren();
+  elements.printDocument.style.setProperty('--print-page-width', exportDocument.printWidth);
+  elements.printDocument.style.setProperty('--print-page-height', exportDocument.printHeight);
+  setPrintPageSize(exportDocument);
   for (let pageIndex = 0; pageIndex < exportDocument.pageCount; pageIndex += 1) {
     const page = document.createElement('div');
     page.className = 'print-page';

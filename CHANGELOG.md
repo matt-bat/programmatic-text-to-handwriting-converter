@@ -4,7 +4,27 @@ Notable changes to Scribble Lab are recorded here.
 
 ## Unreleased
 
-No unreleased changes yet.
+### Added
+
+- Letter, A4, Legal, 5 × 7 card, business-card, and square document formats with matching paged preview and print geometry
+- Ruled, grid, off-white printer, colored, ivory, bright, and recycled paper options
+- Adjustable document wear with independently selectable crumpling, fold creases, water or coffee stains, and fire or smoke damage
+- Line-consistency control for uneven pressure and intermittent pigment transfer
+- Optional monochrome scanned-document simulation with adjustable quality
+- Offline commercial build-provenance certificate issuance and verification tools
+- Corporate licensing contact guidance for organizations that need a more permissive agreement
+
+### Changed
+
+- Letter size now remains independent when Expected Readability or the sample seed changes
+- Maximum-readability cursive reduces high-frequency shape and instance variation while preserving seeded writer character
+- Live preview now presents the same page stack used for PDF export, with bounded-resolution secondary pages for long documents
+- Replaced the previous sage-and-clay interface with a squared print-room visual system using midnight blue, signal orange, registration yellow, and newsprint
+
+### Tests
+
+- Added normalization and geometry coverage for paper, wear, scan, and page-format profiles
+- Added browser coverage for randomized damage, fire and smoke, monochrome scan output, line consistency, and paged preview
 
 ## 1.0.0, 2026-08-23
 

@@ -55,8 +55,9 @@ Run deterministic unit and syntax checks with `npm run check`. The full Playwrig
 7. **Apply the physical controls.** Speed, shakiness, grip, wrist support, wrist angle, slant, spacing, and pressure become bounded coefficients for drift, shear, rotation, deformation, and stroke width. The Expected Readability control coordinates these values for users who do not want to tune them individually.
 8. **Add cursive connections.** In cursive mode, eligible neighboring letters can receive seeded curved connectors. Their frequency responds to the connection and speed controls. Print mode suppresses them.
 9. **Simulate the writing material.** Every path is traversed segment by segment. Ballpoint, fountain pen, pencil, and marker settings change width, layers, spread, opacity, grain, nib direction, and ink continuity. Reservoir level can introduce deterministic thinning or skipped segments.
-10. **Draw the paper and pages.** Canvas 2D paints the selected stock, subtle fibers, optional notebook rules, and the transformed strokes onto fixed Letter-proportioned pages.
-11. **Preview or export.** The app renders only the selected preview page for responsiveness. PDF export takes one stable document snapshot, renders every page locally, and opens the browser print dialog.
+10. **Draw the paper and document damage.** Canvas 2D paints ruled, grid, plain, colored, ivory, bright, or recycled stock. Seeded layers can add fibers, crumpling, fold creases, water or coffee staining, soot, heat discoloration, and high-severity edge burn-through. Damage can sit above ink so degraded areas are genuinely harder to transcribe.
+11. **Simulate transfer and scanning.** Line consistency controls intermittent pigment transfer. Optional scanned-document mode converts the result to monochrome and applies quality-dependent contrast, noise, and scanner streaks.
+12. **Preview or export.** The preview is split into the same page stack used by export. Letter, A4, Legal, 5 × 7 cardstock, business-card, and square formats map to their physical print dimensions. PDF export takes one stable document snapshot, renders every page locally, and opens the browser print dialog.
 
 There is no probabilistic model hidden inside these steps. The apparent naturalness comes from several small, bounded variations working together at different scales.
 
@@ -92,9 +93,13 @@ Please use Scribble Lab for synthetic document creation, education, accessibilit
 - Expected Readability coordinates several physical parameters through one approachable 0 to 100 control, with an extra clarity finish in the final ten percent.
 - Detailed controls model speed, pressure, grip tension, wrist angle, slant, spacing, connection, and reservoir level.
 - Ballpoint, fountain pen, pencil, and marker models respond differently along each stroke.
+- Line consistency models uneven pressure and intermittent pigment transfer independently of the writing tool.
+- Ruled, grid, printer, colored, ivory, bright, and recycled papers can be combined with adjustable crumpling, fold, stain, fire, and smoke damage.
+- Optional monochrome scan simulation and scan quality create deterministic degraded-document variants.
+- Letter, A4, Legal, 5 × 7 card, business-card, and square pages appear as a paginated preview and retain their physical PDF dimensions.
 - Parameter profiles can be saved locally without retaining source text.
 - Plain text and common Markdown structures can be imported up to 50,000 grapheme characters.
-- Long documents paginate into Letter-proportioned pages for PDF export.
+- Long documents paginate into the selected physical page format for PDF export.
 - The same seed and parameters reproduce the same synthetic document across supported browsers.
 
 ## Preview
@@ -107,6 +112,12 @@ Please use Scribble Lab for synthetic document creation, education, accessibilit
 
 ![Scribble Lab materials and stroke construction](docs/screenshots/scribble-lab-materials.png)
 
+| Scanned fire, fold, and stain damage | Bounded multi-page preview |
+|:---:|:---:|
+| ![Scribble Lab scanned-document damage simulation](docs/screenshots/scribble-lab-scanned-damage.png) | ![Scribble Lab paginated document preview](docs/screenshots/scribble-lab-paged-preview.png) |
+
+![Scribble Lab maximum-readability cursive](docs/screenshots/scribble-lab-max-cursive.png)
+
 <p align="center">
   <img src="docs/screenshots/scribble-lab-mobile.png" width="390" alt="Scribble Lab mobile layout">
 </p>
@@ -115,10 +126,13 @@ Please use Scribble Lab for synthetic document creation, education, accessibilit
 
 1. Type or paste text into the source pane. You can also open a `.txt`, `.md`, or `.markdown` file.
 2. Choose Cursive or Print.
-3. Move Expected Readability for a coordinated result, or tune the detailed motion and material controls. The established expressive range continues through 90 percent, while 90 to 100 progressively prioritizes larger, steadier, more separated writing.
-4. Select New sample to generate a different seeded writer.
-5. Save useful parameter combinations as local profiles.
-6. Select Export PDF, then choose Save as PDF in the browser print dialog.
+3. Move Expected Readability for a coordinated result, or tune the detailed motion and material controls. Letter size remains independently adjustable. The final clarity range progressively regularizes cursive deformation, spacing, and transfer without removing seeded writer character.
+4. Choose a paper stock and page format. Colored stock enables its own color picker.
+5. Add document wear and select any combination of crumpling, fold creases, water or coffee stains, and fire or smoke damage. Moving the wear slider creates a fresh pattern; zero remains clean.
+6. Optionally enable Scanned document and tune scan quality.
+7. Select New sample to generate a different seeded writer and wear pattern.
+8. Save useful parameter combinations as local profiles.
+9. Select Export PDF, then choose Save as PDF in the browser print dialog.
 
 Markdown headings, lists, task markers, links, quotes, tables, emphasis, and fenced code are converted into conventions that a person could naturally write by hand.
 
@@ -127,13 +141,21 @@ Markdown headings, lists, task markers, links, quotes, tables, emphasis, and fen
 - Source text stays in the current browser page.
 - Rendering occurs with local Canvas 2D code.
 - Profiles use browser storage and contain generic parameters only.
-- Export metadata records counts and generator settings, not source text.
+- Export metadata records counts and generator settings, not source text. Commercial builds can include an offline-issued, signed build-provenance certificate in that companion JSON.
 - The runtime makes no external network requests.
 - No handwriting or identity reference can be uploaded.
 - A restrictive browser security policy blocks remote scripts, connections, frames, and embedded objects.
 - Character, raw text, file, and saved-profile bounds limit accidental or hostile memory use.
 
 Generated PDF files contain the text you supplied. Store and share those files according to the sensitivity of that text.
+
+## Commercial build provenance
+
+The public build exports metadata marked `not-issued`. For a separately licensed commercial build, Matthew can issue a signed certificate that identifies the licensed build, licensee, licence ID, issue time, and permitted use. The certificate is embedded only in the companion JSON export, never in source text or a hidden network request. Use `node scripts/verify-provenance-certificate.mjs <metadata.json>` to verify a retained certificate.
+
+This is tamper-evident provenance, not a technical lock or a guarantee that an altered, reprinted, or metadata-stripped PDF can be traced. The private signing key must remain outside the repository.
+
+Corporate or commercial use is not granted by the public noncommercial license. More permissive commercial licences are available by separate agreement; contact Matthew Bateman through the project's [GitHub Discussions](https://github.com/matt-bat/programmatic-text-to-handwriting-converter/discussions) to discuss the intended use.
 
 ## Warranty, responsibility, and liability
 
@@ -156,7 +178,7 @@ Run the complete browser workflow suite:
 npm run test:browser
 ```
 
-The browser suite covers Chromium, Firefox, and WebKit. It checks writing-style differences, seeded repeatability, repeated-letter variation, parameter sensitivity, Markdown import, 50,000-character pagination, PDF preparation, responsive layout, keyboard navigation, metadata privacy, local-only runtime behavior, and automated WCAG A and AA rules.
+The browser suite covers Chromium, Firefox, and WebKit. It checks writing-style differences, seeded repeatability, repeated-letter variation, paper formats, randomized stain and fire damage, monochrome scan output, parameter sensitivity, Markdown import, 50,000-character pagination, PDF preparation, responsive layout, keyboard navigation, metadata privacy, local-only runtime behavior, and automated WCAG A and AA rules.
 
 ## Project map
 
@@ -168,7 +190,7 @@ src/handwriting-engine.js    Deterministic pagination and physical stroke simula
 src/stroke-font.js           Bundled vector glyph parsing and measurement
 src/assets/                  Public-domain stroke data and project graphics
 src/profile-store.js         Bounded browser profile persistence
-src/styles.css               Responsive Spatial Canvas visual system
+src/styles.css               Responsive print-room visual system
 tests/                       Unit and cross-browser workflow tests
 docs/architecture.md         Rendering, privacy, and compatibility design
 docs/operations.md           Local operation and verification details
@@ -193,6 +215,8 @@ Copyright © 2026 Matthew Bateman.
 The current Scribble Lab source is available under the [PolyForm Noncommercial License 1.0.0](LICENSE). You may use, study, modify, and share it only for purposes permitted by that license. Commercial use, profit-seeking paid access or hosting, inclusion in a paid product or service, and use for anticipated business revenue or profit are outside the license grant. The standard license also identifies permitted uses for qualifying noncommercial organizations. Redistributed copies must preserve the license and every `Required Notice:` line in [NOTICE.md](NOTICE.md), including credit to Matthew Bateman.
 
 This is a source-available license, not an OSI-approved open-source license. Copies already received under an earlier AGPL release remain governed by that earlier license. The new license applies to this revised version and later versions released under it.
+
+Organizations that need corporate, commercial, hosted, training, or otherwise more permissive rights can contact Matthew Bateman through the project's [GitHub Discussions](https://github.com/matt-bat/programmatic-text-to-handwriting-converter/discussions) to discuss a separate licence. Availability is by agreement and does not change the terms of the public release.
 
 Read [Why this project uses a restrictive license](docs/license-and-safety-rationale.md) for the plain-language reasoning behind the license and safety boundaries. The license text remains the controlling document.
 

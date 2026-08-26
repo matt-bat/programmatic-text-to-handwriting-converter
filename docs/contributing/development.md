@@ -19,7 +19,7 @@ The Python process only serves static files. There is no build step or backend s
 
 - `src/app.js` connects the interface to the document model and export flow.
 - `src/document-import.js` validates and normalizes text and Markdown.
-- `src/handwriting-engine.js` handles profiles, layout, seeded variation, pagination, and drawing.
+- `src/handwriting-engine.js` handles profiles, layout, seeded variation, page geometry, paper damage, scan simulation, pagination, and drawing.
 - `src/stroke-font.js` reads the bundled vector glyph data.
 - `src/profile-store.js` stores bounded parameter profiles in the browser.
 - `src/readability-control.js` maps the readability control to physical settings.

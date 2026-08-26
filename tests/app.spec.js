@@ -206,7 +206,7 @@ test('expected readability coordinates legibility controls without changing the 
   await expect.poll(() => canvasFingerprint(page)).not.toBe(lowFingerprint);
   const high = await captureSettings();
 
-  expect(Number(high.size)).toBeGreaterThan(Number(low.size));
+  expect(high.size).toBe(low.size);
   expect(Number(high.spacing)).toBeGreaterThan(Number(low.spacing));
   expect(Number(high.shakiness)).toBeLessThan(Number(low.shakiness));
   expect(Number(high.pressureVariation)).toBeLessThan(Number(low.pressureVariation));
@@ -221,7 +221,7 @@ test('expected readability coordinates legibility controls without changing the 
   await expect(page.locator('[data-output="readability"]')).toHaveText('Very clear · 100%');
   await expect.poll(() => canvasFingerprint(page)).not.toBe(highFingerprint);
   expect(await captureSettings()).toEqual({
-    size: '42',
+    size: low.size,
     lineHeight: '1.96',
     spacing: '10',
     speed: '88',
@@ -319,6 +319,7 @@ test('metadata export contract excludes source content', async ({ page }) => {
   const metadata = page.locator('#metadataPreview');
   await expect(metadata).toContainText('"identityConditioned": false');
   await expect(metadata).toContainText('"retainedByApp": false');
+  await expect(metadata).toContainText('"status": "not-issued"');
   await expect(metadata).not.toContainText('Do not copy this sentence.');
 
   const [download] = await Promise.all([
@@ -570,13 +571,18 @@ test('meaningful parameter changes produce visibly distinct handwriting', async 
   await setValue('inkColor', '#111111');
 
   for (const [id, low, high, defaultValue, minimumDifference] of [
+    ['lineHeight', 1.25, 2.1, 1.62, 0.4],
     ['slant', -18, 24, 7, 0.65],
     ['shakiness', 0, 100, 24, 0.60],
     ['pressure', 0, 100, 58, 0.25],
+    ['pressureVariation', 0, 100, 36, 0.15],
+    ['lineConsistency', 0, 100, 82, 0.2],
     ['speed', 0, 100, 54, 0.50],
     ['connection', 0, 100, 38, 0.45],
+    ['grip', 48, 100, 44, 0.08],
     ['wristAngle', -25, 25, -5, 0.55],
     ['spacing', -2, 14, 3, 0.75],
+    ['reservoir', 8, 100, 88, 0.15],
     ['size', 22, 52, 34, 0.85],
   ]) {
     await setValue(id, low);
@@ -586,6 +592,108 @@ test('meaningful parameter changes produce visibly distinct handwriting', async 
     expect(await inkMaskDisagreement(page, `${id}-low`, `${id}-high`), id).toBeGreaterThan(minimumDifference);
     await setValue(id, defaultValue);
   }
+});
+
+test('every discrete renderer option can be exercised without stale state', async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.getByLabel('Source text').fill('Options matrix: minimum rhythm 0123456789.');
+
+  const expectCanvasChange = async (action) => {
+    const before = await canvasFingerprint(page);
+    await action();
+    await expect.poll(() => canvasFingerprint(page)).not.toBe(before);
+  };
+
+  for (const instrument of ['pencil', 'marker', 'pen']) {
+    const button = page.getByRole('button', { name: new RegExp(`^${instrument}$`, 'i') });
+    await button.click();
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#previewSubtitle')).toContainText(new RegExp(instrument, 'i'));
+    await expect(page.locator('#materialReadout')).toContainText(new RegExp(instrument === 'pen' ? 'Ballpoint' : instrument, 'i'));
+  }
+
+  await page.getByRole('tab', { name: /materials/i }).click();
+  for (const penKind of ['fountain', 'ballpoint']) {
+    await expectCanvasChange(() => page.getByLabel('Pen mechanism').selectOption(penKind));
+  }
+  for (const construction of ['complex', 'simplex']) {
+    await expectCanvasChange(() => page.getByLabel('Cursive detail').selectOption(construction));
+  }
+  for (const paper of ['grid', 'printer', 'colored', 'ivory', 'bright', 'recycled', 'notebook']) {
+    await expectCanvasChange(() => page.getByLabel('Paper stock').selectOption(paper));
+  }
+
+  const pageDimensions = {
+    letter: [1100, 1424], a4: [1100, 1556], legal: [1100, 1812],
+    cardstock: [1100, 1540], business: [1100, 629], square: [1100, 1100],
+  };
+  for (const [pageSize, [width, height]] of Object.entries(pageDimensions)) {
+    await page.getByLabel('Paper size').selectOption(pageSize);
+    await expect.poll(() => page.locator('#outputCanvas').evaluate((canvas) => [canvas.width, canvas.height])).toEqual([width, height]);
+  }
+
+  await page.locator('#paperWear').fill('75');
+  for (const id of ['wearCrumple', 'wearCreases', 'wearStains', 'wearFire']) {
+    for (const damageId of ['wearCrumple', 'wearCreases', 'wearStains', 'wearFire']) {
+      await page.locator(`#${damageId}`).uncheck();
+    }
+    await expectCanvasChange(() => page.locator(`#${id}`).check());
+  }
+
+  const beforeScanQuality = await canvasFingerprint(page);
+  await page.locator('#scanMode').check();
+  await page.locator('#scanQuality').fill('0');
+  await expect.poll(() => canvasFingerprint(page)).not.toBe(beforeScanQuality);
+  const lowQuality = await canvasFingerprint(page);
+  await page.locator('#scanQuality').fill('100');
+  await expect.poll(() => canvasFingerprint(page)).not.toBe(lowQuality);
+
+  await page.getByRole('tab', { name: /hand motion/i }).click();
+  const textured = await canvasFingerprint(page);
+  await page.locator('label[for="paperTextureToggle"]').click();
+  await expect.poll(() => canvasFingerprint(page)).not.toBe(textured);
+  const supported = await canvasFingerprint(page);
+  await page.locator('label[for="wristSupport"]').click();
+  await expect.poll(() => canvasFingerprint(page)).not.toBe(supported);
+});
+
+test('paper formats, damage layers, and scan simulation remain live and reproducible for export', async ({ page }) => {
+  test.setTimeout(40_000);
+  await page.getByLabel('Source text').fill('Archive ledger entry 1947. Damage may cross this transcription line. '.repeat(400));
+  await page.getByRole('tab', { name: /materials/i }).click();
+
+  await page.getByLabel('Paper size').selectOption('a4');
+  await expect.poll(() => page.locator('#outputCanvas').evaluate((canvas) => canvas.height)).toBe(1556);
+  const expectedPages = Number(await page.locator('#pageCount').textContent());
+  expect(expectedPages).toBeGreaterThan(1);
+  await expect(page.locator('#previewPages .page-shadow')).toHaveCount(expectedPages);
+
+  const plainFingerprint = await canvasFingerprint(page);
+  await page.getByLabel('Paper stock').selectOption('colored');
+  await page.locator('#paperColor').fill('#d5c5df');
+  await expect(page.locator('#paperColorCode')).toHaveText('#D5C5DF');
+  await expect.poll(() => canvasFingerprint(page)).not.toBe(plainFingerprint);
+
+  await page.locator('#paperWear').fill('82');
+  await expect(page.locator('[data-output="paperWear"]')).toHaveText('Damaged · 82%');
+  const firstDamage = await canvasFingerprint(page);
+  await page.locator('#paperWear').evaluate((element) => element.dispatchEvent(new Event('input', { bubbles: true })));
+  await expect.poll(() => canvasFingerprint(page)).not.toBe(firstDamage);
+
+  const stainDamage = await canvasFingerprint(page);
+  await page.locator('#wearFire').check();
+  await expect.poll(() => canvasFingerprint(page)).not.toBe(stainDamage);
+
+  await expect(page.locator('#scanQuality')).toBeDisabled();
+  await page.locator('#scanMode').check();
+  await expect(page.locator('#scanQuality')).toBeEnabled();
+  await expect.poll(() => page.locator('#outputCanvas').evaluate((canvas) => {
+    const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+    for (let index = 0; index < data.length; index += 400) {
+      if (data[index] !== data[index + 1] || data[index + 1] !== data[index + 2]) return false;
+    }
+    return true;
+  })).toBe(true);
 });
 
 test('repeated letters vary naturally within consistent writer proportions', async ({ page }) => {

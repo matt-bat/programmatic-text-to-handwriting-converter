@@ -21,7 +21,6 @@ test('higher readability consistently moves legibility controls toward clearer s
   const low = deriveReadabilityAdjustments(10, 43182);
   const high = deriveReadabilityAdjustments(90, 43182);
 
-  assert.ok(high.size > low.size);
   assert.ok(high.lineHeight > low.lineHeight);
   assert.ok(high.spacing > low.spacing);
   assert.ok(high.speed < low.speed);
@@ -53,7 +52,6 @@ test('cursive readability receives a deterministic legibility correction between
   const replay = deriveReadabilityAdjustments(65, 43182, 'cursive');
 
   assert.deepEqual(cursive, replay);
-  assert.ok(cursive.size > print.size);
   assert.ok(cursive.lineHeight > print.lineHeight);
   assert.ok(cursive.shakiness < print.shakiness);
   assert.ok(cursive.pressureVariation < print.pressureVariation);
@@ -72,7 +70,6 @@ test('the final ten percent adds maximum clarity without changing the establishe
   const maximum = deriveReadabilityAdjustments(100, 43182, 'print');
 
   assert.deepEqual(clear, {
-    size: 38,
     lineHeight: 1.78,
     spacing: 6,
     speed: 76,
@@ -88,7 +85,6 @@ test('the final ten percent adds maximum clarity without changing the establishe
     construction: 'simplex',
   });
   assert.deepEqual(maximum, {
-    size: 42,
     lineHeight: 1.96,
     spacing: 10,
     speed: 88,
